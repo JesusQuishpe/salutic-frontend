@@ -1,14 +1,24 @@
-import { Button, Card, Col, DatePicker, Form, Input, Row, Select } from 'antd'
+import {
+	Button,
+	Card,
+	Col,
+	DatePicker,
+	Form,
+	Input,
+	message,
+	Row,
+	Select,
+} from 'antd'
 import moment from 'moment'
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { useLoader } from '../../hooks/useLoader'
+import LoaderContext from '../../contexts/LoaderContext'
 import { PatientService } from '../../services/PatientService'
 
 const { Option } = Select
 
 export const PatientForm = () => {
-	const { openLoader, closeLoader } = useLoader()
+	const { openLoader, closeLoader } = useContext(LoaderContext)
 	const [form] = Form.useForm()
 	const { patientId } = useParams()
 	const isEdit = !!patientId
@@ -39,6 +49,7 @@ export const PatientForm = () => {
 					{ ...values, birthDate },
 					parseInt(patientId)
 				)
+				message.success('Paciente actualizado correctamente')
 			} else {
 				openLoader('Creando...')
 				await PatientService.createPatient({
@@ -46,6 +57,8 @@ export const PatientForm = () => {
 					birthDate,
 					attended: true,
 				})
+				message.success('Paciente creado correctamente')
+				form.resetFields()
 			}
 		} catch (error) {
 			console.log(error)
