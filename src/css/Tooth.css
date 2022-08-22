@@ -1,0 +1,58 @@
+.tooth-wrapper{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tooth-reverse{
+  flex-direction: column-reverse;
+}
+
+.symbo-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+  left: 0;
+  top: 0;
+  display: none;
+  z-index: 80;
+}
+.symbo-container.hover:hover {
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: rgba(81, 186, 253, 0.5);
+}
+
+.tooth {
+  width: 30px;
+  height: 30px;
+  z-index: 50;
+  position: relative;
+}
+.btn-tooth {
+  fill: white;
+  stroke: black;
+  stroke-width: 2;
+}
+
+.btn-tooth:hover {
+  cursor: pointer;
+  fill: gray;
+}
+
+.btn-tooth.blue {
+  fill: blue;
+}
+.btn-tooth.red {
+  fill: red;
+}
+
+.symbo-wrapper-img{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}

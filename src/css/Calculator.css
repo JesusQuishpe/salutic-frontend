@@ -1,0 +1,16 @@
+.calculator-wrapper{
+  display: grid;
+  grid-template-columns: repeat(5,1fr);
+  gap: 4px;
+  width: 100%;
+}
+.calculator-button{
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 5px;
+}
+.calculator-button.clean-button{
+  grid-column-start: 4;
+  grid-column-end: 6;
+  grid-row-start: 4;
+}

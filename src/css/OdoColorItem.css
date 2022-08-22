@@ -1,0 +1,25 @@
+.colores{
+  width: 150px;
+}
+.paleta-red {
+  height: 20px;
+  width: 80px;
+  background-color: #dc3545;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.paleta-red.selected {
+  border: 2px solid #000;
+}
+.paleta-blue {
+  background-color: #0d6efd;
+  height: 20px;
+  width: 80px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.paleta-blue.selected {
+  border: 2px solid #000;
+}

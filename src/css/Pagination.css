@@ -1,0 +1,19 @@
+.custom-pagination{
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+.list-none{
+    list-style: none;
+}
+.custom-pagination .pagination-item{
+    cursor: pointer;
+}
+
+.custom-pagination .pagination-input{
+    width: 60px;
+    padding: 0;
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, .125);
+    
+}

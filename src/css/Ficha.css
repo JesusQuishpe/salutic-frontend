@@ -1,0 +1,391 @@
+textarea {
+  resize: none;
+}
+/*Tabpane*/
+/*.tab-content>.tab-pane{
+  opacity: 0;
+  visibility: hidden;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.tab-content>.active{
+  opacity: 1;
+  visibility: visible;
+  display: block;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+.tab-pane{
+  opacity: 0;
+  visibility: hidden;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.tab-pane.active{
+  opacity: 1;
+  visibility: visible;
+  display: block;
+  position: relative;
+  top: 0;
+  left: 0;
+}*/
+
+/*Indicadores*/
+.tb-piezas {
+  border-collapse: collapse;
+  border: 1px solid black;
+  width: 100%;
+  text-align: center;
+}
+
+.tb-piezas thead {
+  background-color: #75a478;
+  color: whitesmoke;
+}
+
+.tb-piezas thead,
+.tb-piezas td,
+.tb-piezas tr,
+.tb-piezas th {
+  height: 30px;
+  border: 1px solid #ccc;
+  background-color: #75a478;
+  font-weight: 400;
+}
+
+.tb-piezas .piezas-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 100%;
+}
+
+.tb-piezas .pieza-item {
+  -webkit-box-flex: 1;
+  -ms-flex: 1 1 calc((100% - 70px) / 3);
+  flex: 1 1 calc((100% - 70px) / 3);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  border-right: 1px solid #ccc;
+}
+
+.tb-piezas .pieza-item:last-child {
+  border-right: none;
+}
+
+.tb-piezas .pieza-item div {
+  border-right: 1px solid #ccc;
+  padding: 5px;
+  width: 26px;
+  height: 100%;
+  background-color: #75a478;
+}
+
+.tb-piezas .pieza-item div span {
+  -ms-flex-item-align: center;
+  -ms-grid-row-align: center;
+  align-self: center;
+  font-size: 13px;
+}
+
+.tb-piezas .pieza-item .col-check {
+  -ms-flex-item-align: center;
+  -ms-grid-row-align: center;
+  align-self: center;
+  margin: 0px auto;
+}
+
+.tb-piezas .col-input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 5px;
+  text-align: center;
+  font-size: 13px;
+}
+
+/*Tabla diagnosticos*/ 
+.tb-odontologia {
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+  width: 100%;
+  table-layout: fixed;
+  min-width: 600px;
+}
+
+.tb-odontologia thead {
+  background-color: #75a478;
+  color: whitesmoke;
+}
+.tb-odontologia th {
+  padding: 10px;
+  font-weight: 500;
+  
+}
+.tb-odontologia th:first-child {
+  width: 50%;
+}
+.tb-odontologia .text {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tb-odontologia td {
+  padding: 10px;
+  border-right: 1px solid #ccc;
+}
+
+.tb-odontologia td:nth-last-child(-n + 2) {
+  text-align: center;
+}
+
+.tb-odontologia tbody tr {
+  cursor: pointer;
+}
+.tb-odontologia tbody tr:hover {
+  background-color: #ddd;
+}
+
+.tb-odontologia tbody tr.selected {
+  background-color: lightblue;
+}
+
+/*Sidebar*/
+.sidebar {
+  padding: 20px;
+  position: fixed;
+  top: 56px;
+  left: 0;
+  height: calc(100vh - 56px);
+  overflow: auto;
+  width: 320px;
+  min-width: 320px;
+  -webkit-box-shadow: 4px 4px 15px 5px #ccc;
+          box-shadow: 4px 4px 15px 5px #ccc;
+}
+
+/*Ficha*/
+.ficha-container{
+  position: relative;
+}
+.ficha-content{
+  position: absolute;
+  top: 0px;
+  left: 320px;
+  width: calc(100% - 320px);
+  height: calc(100vh - 56px);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding: 20px;
+}
+
+/*Odontograma*/
+
+
+.diente-simbo-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+  left: 0;
+  top: 0;
+  display: none;
+  z-index: 80;
+}
+
+.diente-simbo-container.hover:hover {
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: rgba(81, 186, 253, 0.5);
+}
+.diente {
+  width: 30px;
+  height: 30px;
+  z-index: 50;
+  position: relative;
+}
+.btn-diente {
+  fill: white;
+  stroke: black;
+  stroke-width: 2;
+}
+
+.btn-diente:hover {
+  cursor: pointer;
+  fill: gray;
+}
+
+.btn-diente.color-blue {
+  fill: blue;
+}
+.btn-diente.color-red {
+  fill: red;
+}
+/*Estilos simbologias paleta*/
+.paleta-container{
+  padding: 20px 0px;
+  width: 100%;
+  display: flex;
+}
+.colores{
+  width: 150px;
+}
+.paleta-red {
+  height: 20px;
+  width: 80px;
+  background-color: #dc3545;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.paleta-red.selected {
+  border: 2px solid #000;
+}
+.paleta-blue {
+  
+  background-color: #0d6efd;
+  height: 20px;
+  width: 80px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.paleta-blue.selected {
+  border: 2px solid #000;
+}
+
+.simbologias{
+  width: 100%;
+  margin-right: 20px;
+}
+.simbologias-container {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.simbolo-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.simbolo {
+  cursor: pointer;
+  padding: 5px 7px;
+}
+
+.simbolo.selected {
+  background-color: #0d6efd;
+}
+
+.simbolo-img {
+  width: 20px;
+  height: 20px;
+}
+
+
+.grid-odontograma{
+  display: grid;
+  grid-template-columns: 100px 1fr 1fr;
+  row-gap: 8px;
+  column-gap: 8px;
+  width: 100%;
+  height: 100%;
+}
+
+.cuadrante{
+  display: grid;
+  grid-template-columns: repeat(8,1fr);
+  column-gap: 4px;
+}
+
+
+.cuadrante-item{
+  width: 30px;
+}
+
+.option-selected{
+  border: 1.7px solid #000;
+}
+
+.btn-limpiar{
+  cursor: pointer;
+}
+
+.acta-dropzone{
+  border: 2px dashed #ccc;
+  position: relative;
+  width: 100%;
+  height: 300px;
+  padding: 20px;
+}
+.acta-dropzone.dragActive{
+  border: 2px dashed #75a478;
+}
+
+.acta-info{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.acta-file{
+  width:120px;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 10px 0px;
+  background-color: #f6f6f8;
+  padding: 0px 8px;
+}
+
+.acta-thumb{
+  flex: 1;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.thumb-text{
+  font-size: 10px;
+  font-weight: 400;
+  text-align: center;
+  max-height: 45px;
+  overflow: hidden;
+  min-height: 30px;
+}
+.thumb-text.overflow{
+  text-overflow: ellipsis;
+}
+
+.space-align-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+

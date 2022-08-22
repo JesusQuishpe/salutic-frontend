@@ -1,0 +1,50 @@
+.results-header{
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+}
+.results-header .header-col{
+  font-size: 11px;
+  font-style: italic;
+  font-weight: 500;
+}
+.area-wrapper {
+  width: 100%;
+}
+
+.area-title {
+  padding: 3px 5px;
+  text-align: center;
+  display: block;
+  font-size: 18px;
+  border-bottom: 1px solid #ccc;
+}
+
+.group-wrapper {}
+
+.group-title {
+  display: block;
+  font-weight: 500;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.tests-wrapper {}
+
+.test-row {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  align-items: center;
+  margin-bottom: 5px;
+}
+.test-col{
+  width: 100%;
+  font-size: 12px;
+}
+.test-title{
+  
+}
+.interpretation{
+  display: flex;
+  flex-direction: column;
+
+}

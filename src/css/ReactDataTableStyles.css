@@ -1,0 +1,34 @@
+.rdt_Table {
+  
+}
+
+.rdt_TableRow {}
+
+.rdt_TableCol {
+  background-color: #f8f8f8;
+}
+
+.rdt_TableCol_Sortable {}
+
+.rdt_TableCell {}
+
+.rdt_TableHeader {}
+
+.rdt_TableFooter {}
+
+.rdt_TableHead {
+  border: 1px solid #babfc7;
+  border-bottom: none;
+}
+
+.rdt_TableHeadRow {
+  
+}
+
+.rdt_TableBody {
+  border: 1px solid #babfc7;
+}
+
+.rdt_Pagination {
+  border: 1px solid #babfc7;
+}

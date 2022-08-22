@@ -1,0 +1,212 @@
+.odontogram-grid{
+  display: grid;
+  grid-template-columns: 100px 1fr 1fr;
+  row-gap: 8px;
+  column-gap: 8px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/*Paleta simbologias*/
+
+.symbologies{
+  width: 100%;
+  margin-right: 20px;
+}
+.symbologies-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin-top: 10px;
+}
+.symbology {
+  cursor: pointer;
+  padding: 5px 7px;
+}
+
+.symbology img{
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+.symbology.selected{
+  background-color: #0d6efd;
+}
+
+/*Paleta colores*/
+
+.colors{
+  width: 150px;
+}
+.palette-red {
+  height: 20px;
+  width: 100%;
+  background-color: #dc3545;
+  cursor: pointer;
+}
+
+.palette-red.selected {
+  border: 2px solid #000;
+}
+
+.palette-blue {
+  background-color: #0d6efd;
+  height: 20px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.palette-blue.selected {
+  border: 2px solid #000;
+}
+
+/*Odontograma dientes*/
+
+.tooth-wrapper{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tooth-reverse{
+  flex-direction: column-reverse;
+}
+
+.symbo-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+  left: 0;
+  top: 0;
+  display: none;
+  z-index: 80;
+}
+.symbo-container.hover:hover {
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: rgba(81, 186, 253, 0.5);
+}
+
+.tooth {
+  width: 30px;
+  height: 30px;
+  z-index: 50;
+  position: relative;
+}
+.btn-tooth {
+  fill: white;
+  stroke: black;
+  stroke-width: 2;
+}
+
+.btn-tooth:hover {
+  cursor: pointer;
+  fill: gray;
+}
+
+.btn-tooth.blue {
+  fill: blue;
+}
+.btn-tooth.red {
+  fill: red;
+}
+
+.symbo-wrapper-img{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.clean-icon{
+  width: 100%;
+  border: 1px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  cursor: pointer;
+}
+.clean-icon.selected{
+  border: 2px solid #000;
+}
+/*Acta*/
+.acta-dropzone{
+  border: 2px dashed #ccc;
+  position: relative;
+  width: 100%;
+  height: 300px;
+  padding: 20px;
+}
+.acta-dropzone.dragActive{
+  border: 2px dashed #75a478;
+}
+
+.acta-info{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.acta-file{
+  width:120px;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 10px 0px;
+  background-color: #f6f6f8;
+  padding: 0px 8px;
+}
+
+.acta-thumb{
+  flex: 1;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.thumb-text{
+  font-size: 10px;
+  font-weight: 400;
+  text-align: center;
+  max-height: 45px;
+  overflow: hidden;
+  min-height: 30px;
+}
+.thumb-text.overflow{
+  text-overflow: ellipsis;
+}
+
+.space-align-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+/*Estilos para la pestaña indicadores*/
+.editable-cell {
+  position: relative;
+}
+
+.editable-cell-value-wrap {
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.editable-row:hover .editable-cell-value-wrap {
+  padding: 4px 11px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+}

@@ -1,0 +1,15 @@
+.not-found-wrapper{
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.not-found-content{
+  display: flex;
+  flex-direction: column;
+}
+.not-found-text{
+  color: gray;
+  text-align: center;
+}
