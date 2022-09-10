@@ -1,4 +1,4 @@
-import { axiosGet, axiosPost, axiosPut } from './axiosRequests'
+import { axiosDelete, axiosGet, axiosPost, axiosPut } from './axiosRequests'
 
 export const PatientService = {
 	getAllPatients: (page) => axiosGet(`patients?page=${page}`),
@@ -7,4 +7,5 @@ export const PatientService = {
 		axiosGet(`patients?identification=${identification}`),
 	createPatient: (data) => axiosPost('patients', data),
 	updatePatient: (data, id) => axiosPut(`patients/${id}`, data),
+	deletePatient: (id) => axiosDelete(`patients/${id}`),
 }

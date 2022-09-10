@@ -1,22 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import moment from 'moment'
-import { createDataToIndicators } from '../../../components/odontologia/nueva-consulta/OdoIndicatorsTab'
 import { generateUniqueId } from '../../../utils/functions'
-
-const hasSomeItem = (tooth) => {
-	//Si está en blanco quiere decir que no hay ningun lado pintado
-	if (
-		tooth.topSide !== '' ||
-		tooth.rightSide !== '' ||
-		tooth.leftSide !== '' ||
-		tooth.bottomSide !== '' ||
-		tooth.centerSide !== '' ||
-		tooth.symboPath !== ''
-	) {
-		return true
-	}
-	return false
-}
 
 const initialValues = {
 	generalInfo: {
@@ -83,27 +67,37 @@ export const odontologySlice = createSlice({
 		acta: null,
 		isLoading: false,
 		isClickOutSidePalette: false,
+		odoCitationError: false,
+		isActaChanged: false,
 	},
 	reducers: {
 		setLoading: (state, action) => {
 			state.isLoading = action.payload
 		},
+		setOdoCitationError: (state, action) => {
+			state.odoCitationError = action.payload
+		},
+		updateActaChanged: (state, action) => {
+			state.isActaChanged = action.payload
+		},
 		setDataForNewConsultation: (state, action) => {
 			console.log(action)
 			const data = action.payload
 			state.data = data
-			state.movilitiesRecessions = data?.odontogram?.movilitiesRecessions
-			state.teeth = data?.odontogram?.teeth.map((detail) => ({
-				topSide: detail.topSide,
-				rightSide: detail.rightSide,
-				bottomSide: detail.bottomSide,
-				leftSide: detail.leftSide,
-				centerSide: detail.centerSide,
-				symboPath: detail.symbologie?.path,
-				symboId: detail.symboId,
-				toothId: detail.toothId,
-				id: detail.id,
-			}))
+			state.movilitiesRecessions =
+				data?.odontogram?.movilitiesRecessions || []
+			state.teeth =
+				data?.odontogram?.teeth.map((detail) => ({
+					topSide: detail.topSide,
+					rightSide: detail.rightSide,
+					bottomSide: detail.bottomSide,
+					leftSide: detail.leftSide,
+					centerSide: detail.centerSide,
+					symboPath: detail.symbologie?.path,
+					symboId: detail.symboId,
+					toothId: detail.toothId,
+					id: detail.id,
+				})) || []
 		},
 		setDataForEdit: (state, action) => {
 			const data = action.payload
@@ -260,6 +254,7 @@ export const odontologySlice = createSlice({
 			state.acta = null
 			state.isLoading = false
 			state.isClickOutSidePalette = false
+			state.odoCitationError = false
 		},
 	},
 })
@@ -280,4 +275,6 @@ export const {
 	setIsClickOutsidePalette,
 	setActa,
 	resetStateOnOdontology,
+	setOdoCitationError,
+	updateActaChanged,
 } = odontologySlice.actions

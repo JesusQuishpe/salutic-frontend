@@ -118,6 +118,7 @@ const MedCies = ({ isEdit, data, update }) => {
 			setCies(
 				data.map((item) => ({
 					...item,
+					id: item.id,
 					code: item.cie.code,
 					disease: item.cie.disease,
 					diagnosticDate: createDateFromString(item.diagnosticDate),

@@ -1,20 +1,23 @@
-import { Button, Card, Row, Space, Tabs } from 'antd'
+import { Button, Card, Row, Space, Spin, Tabs, message } from 'antd'
 import { useParams } from 'react-router-dom'
 import PatientRecordTab from './PatientRecordTab'
 import PersonalInformationTab from './PersonalInformationTab'
 import { SaveOutlined } from '@ant-design/icons'
 import PhysicalExplorationTab from './PhysicalExplorationTab'
 import InterrogationTab from './InterrogationTab'
-import { LoadingPage } from '../../loading-page/LoadingPage'
 import LifeStyleTab from './LifeStyleTab'
 import { useDispatch, useSelector } from 'react-redux/es/exports'
 import { useContext, useEffect } from 'react'
 import { getExpedientById } from '../../../store/slices/expedient/thunks'
-import { mapNullToZero } from '../../../utils/functions'
+
 import { ExpedientService } from '../../../services/ExpedientService'
 import LoaderContext from '../../../contexts/LoaderContext'
 import AllergiesTab from './AllergiesTab'
 import { ConsultationsTab } from './ConsultationsTab'
+import { axiosErrorHandler } from '../../../handlers/axiosErrorHandler'
+import { PrevLoadingPage } from '../../antd/PrevLoadingPage'
+import { ContentNotFound } from '../../not-found/ContentNotFound'
+import { resetExpedientData } from '../../../store/slices/expedient/expedientSlice'
 const { TabPane } = Tabs
 
 export const Expedient = () => {
@@ -22,6 +25,7 @@ export const Expedient = () => {
 	const dispatch = useDispatch()
 	const {
 		isLoading,
+		notFound,
 		data,
 		personalInformation,
 		aditionalInformation,
@@ -50,33 +54,44 @@ export const Expedient = () => {
 				patientRecord,
 				physicalExploration,
 				interrogation,
-				lifestyle: {
-					...physicalActivity,
-					...smoking,
-					...feedingHabits,
-					...others,
-				},
+				physicalActivity,
+				smoking,
+				feedingHabits,
+				others,
 				allergies,
 			}
 			console.log(expedient)
-			//await ExpedientService.updateExpedient(expedient, data.id)
+			await ExpedientService.updateExpedient(expedient, data.id)
+			message.success('Expediente actualizado correctamente')
 			closeLoader()
 		} catch (error) {
 			console.log(error)
+			const { message: errorMessage } = axiosErrorHandler(error)
+			message.error(errorMessage)
 			closeLoader()
 		}
 	}
 
 	useEffect(() => {
 		dispatch(getExpedientById(parseInt(expedientId)))
+		return () => {
+			dispatch(resetExpedientData())
+		}
 	}, [])
 
 	if (isLoading) {
-		return <LoadingPage />
+		return <PrevLoadingPage />
+	}
+
+	if (notFound) {
+		return <ContentNotFound />
 	}
 
 	return (
-		<Card title={isEdit ? 'Actualizar expediente' : 'Crear expendiente'}>
+		<Card
+			title={isEdit ? 'Actualizar expediente' : 'Crear expendiente'}
+			type='inner'
+		>
 			<Row style={{ marginBottom: '20px' }} gutter={10} justify='end'>
 				<Space>
 					<Button onClick={onSave} disabled={!data.id}>

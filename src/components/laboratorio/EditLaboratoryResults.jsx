@@ -1,5 +1,5 @@
 import { Button, Card, Col, message, Row, Space } from 'antd'
-import React, { useEffect, useMemo, useRef, useState, useContext } from 'react'
+import React, { useEffect, useRef, useState, useContext } from 'react'
 import { LaboratoryPatientCard } from './LaboratoryPatientCard'
 import { useParams } from 'react-router-dom'
 import { LaboratoryResultService } from '../../services/LaboratoryResultService'
@@ -12,6 +12,8 @@ import { Parser } from 'expr-eval'
 
 import LoaderContext from '../../contexts/LoaderContext'
 import { END_POINT } from '../../utils/conf'
+import { axiosErrorHandler } from '../../handlers/axiosErrorHandler'
+import { ContentNotFound } from '../not-found/ContentNotFound'
 
 const getPatientInfo = (result) => {
 	return {
@@ -35,15 +37,14 @@ const getOrderInfo = (result) => {
 }
 
 export const EditLaboratoryResults = () => {
-	console.log('REDE')
 	const gridRef = useRef(null)
 	const { openLoader, closeLoader } = useContext(LoaderContext)
 	const { resultId } = useParams()
-	const [loading, setLoading] = useState(false)
 	const [patientInfo, setPatientInfo] = useState(null)
 	const [orderInfo, setOrderInfo] = useState(null)
 	const [tests, setTests] = useState(null)
-
+	const [responseError, setResponseError] = useState(false)
+  const [notFound, setNotFound] = useState(false)
 	/**
 	 * Este metodo agrega la propiedad "result" para evitar errores en
 	 * el valueGetter de la columna resultado de la tabla
@@ -73,10 +74,16 @@ export const EditLaboratoryResults = () => {
 				console.log(result)
 				setPatientInfo(getPatientInfo(result))
 				setOrderInfo(getOrderInfo(result))
-				console.log(addIsFirstTimePropertyToData(result.tests))
+				//console.log(addIsFirstTimePropertyToData(result.tests))
 				setTests(addIsFirstTimePropertyToData(result.tests))
 			})
-			.catch((err) => console.log(err))
+			.catch((error) => {
+				console.log(error)
+				const { status } = axiosErrorHandler(error)
+				if (status && status === 404) {
+					setNotFound(true)
+				}
+			})
 			.finally(() => closeLoader())
 	}
 	const columnDefs = [
@@ -128,7 +135,6 @@ export const EditLaboratoryResults = () => {
 				return params.newValue
 			},
 			cellStyle: (params) => {
-				//Falta validar cuando haya datos de la base de datos
 				if (
 					typeof params.data.result === 'undefined' ||
 					params.data.result === ''
@@ -149,24 +155,24 @@ export const EditLaboratoryResults = () => {
 						const of = parseFloat(params.data.of)
 						const until = parseFloat(params.data.until)
 						//console.log(value, of, until);
-						return !(value > of && value < until)
+						return !(value >= of && value <= until)
 							? { color: 'red' }
 							: null //Si no está en el rango pinta de rojo
 					} else if (params.data.operatorType === '<') {
 						const operatorValue = parseFloat(
 							params.data.operatorValue
 						)
-						return value < operatorValue ? { color: 'red' } : null
+						return value < operatorValue ? null : { color: 'red' }
 					} else if (params.data.operatorType === '>') {
 						const operatorValue = parseFloat(
 							params.data.operatorValue
 						)
-						return value > operatorValue ? { color: 'red' } : null
+						return value > operatorValue ? null : { color: 'red' }
 					} else if (params.data.operatorType === '=') {
 						const operatorValue = parseFloat(
 							params.data.operatorValue
 						)
-						return value === operatorValue ? { color: 'red' } : null
+						return value === operatorValue ? null : { color: 'red' }
 					}
 				} else if (params.data.refValue === 'C') {
 					if (
@@ -186,11 +192,11 @@ export const EditLaboratoryResults = () => {
 
 					if (!patientInfo.gender) return null
 					if (patientInfo.gender === 'Masculino')
-						return value > maleOf && value < maleUntil
+						return value >= maleOf && value <= maleUntil
 							? null
 							: { color: 'red' }
 					if (patientInfo.gender === 'Femenino')
-						return value > femaleOf && value < femaleUntil
+						return value >= femaleOf && value <= femaleUntil
 							? null
 							: { color: 'red' }
 				}
@@ -349,6 +355,11 @@ export const EditLaboratoryResults = () => {
 		}
 	}
 
+
+  if (notFound) {
+		return <ContentNotFound />
+	}
+
 	return (
 		<Card title='Actualizar resultados'>
 			<Row justify='end' style={{ marginBottom: '10px' }}>
@@ -358,6 +369,7 @@ export const EditLaboratoryResults = () => {
 						href={END_POINT + `resultado/pdf/${resultId}`}
 						target='_blank'
 						size='large'
+						disabled={!resultId || responseError}
 					>
 						Ver PDF
 					</Button>
@@ -365,7 +377,7 @@ export const EditLaboratoryResults = () => {
 						type='primary'
 						size='large'
 						onClick={handleSave}
-						disabled={!resultId}
+						disabled={!resultId || responseError}
 					>
 						Actualizar
 					</Button>

@@ -112,7 +112,7 @@ const FeedingHabits = ({ feedingHabits, update }) => {
 }
 const mapStateToProps = (state) => {
 	return {
-		feedingHabits: state.expedient.feedingHabits,
+		feedingHabits: state.expedient.data.feedingHabits,
 	}
 }
 const mapDispatchToProps = (dispatch) => {

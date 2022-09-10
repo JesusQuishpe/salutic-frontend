@@ -9,7 +9,7 @@ UserService.login=async(email:string,password:string):Promise<User>=>{
 }*/
 
 export const UserService = {
-	login: (email, password) => axiosPost('login', { email, password }),
+	login: (username, password) => axiosPost('login', { username, password }),
 	getUsers: () => axiosGet('usuarios'),
 	getById: (id) => axiosGet(`usuarios/${id}`),
 	createUser: (data) => axiosPost('usuarios', data),

@@ -1,15 +1,24 @@
 import { Card, Input, Typography } from 'antd'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { updateAllergies } from '../../../store/slices/expedient/expedientSlice'
 
 const { Text } = Typography
 
 const AllergiesTab = ({ allergies, update }) => {
+	const [description, setDescription] = useState('')
+
 	const updateForm = (e) => {
 		const { name, value } = e.target
 		update({ ...allergies, [name]: value })
+		setDescription(value)
 	}
+
+	useEffect(() => {
+		if (allergies) {
+			setDescription(allergies.description)
+		}
+	}, [allergies])
 
 	return (
 		<Card title='Alergias'>
@@ -19,7 +28,7 @@ const AllergiesTab = ({ allergies, update }) => {
 			<Input.TextArea
 				rows={10}
 				name='description'
-				value={allergies.description}
+				value={description}
 				onChange={updateForm}
 			/>
 		</Card>
@@ -27,7 +36,7 @@ const AllergiesTab = ({ allergies, update }) => {
 }
 const mapStateToProps = (state) => {
 	return {
-		allergies: state.expedient.allergies,
+		allergies: state.expedient.data.allergies,
 	}
 }
 const mapDispatchToProps = (dispatch) => {

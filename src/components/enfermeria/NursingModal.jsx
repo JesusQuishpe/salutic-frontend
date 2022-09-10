@@ -41,6 +41,7 @@ const NursingModal = ({ closeModal, parameters, loadPatientQueue }) => {
 				message.success('Datos actualizados')
 				closeModal()
 			}
+			form.resetFields(Object.keys(initialForm))
 		} catch (error) {
 			console.log(error)
 		}
@@ -52,7 +53,7 @@ const NursingModal = ({ closeModal, parameters, loadPatientQueue }) => {
 	const loadDataForEdit = async (nurId) => {
 		const result = await NursingService.getById(nurId)
 		form.setFieldsValue({
-			appo_id: result.appoId,
+			appoId: result.appoId,
 			weight: result.weight,
 			stature: result.stature,
 			temperature: result.temperature,
@@ -105,13 +106,18 @@ const NursingModal = ({ closeModal, parameters, loadPatientQueue }) => {
 		}
 	}
 
+	const handleCloseModal = () => {
+		form.resetFields(Object.keys(initialForm))
+		closeModal()
+	}
+
 	return (
 		<Modal
 			title='Ingreso de datos'
 			visible={show}
-			onCancel={closeModal}
+			onCancel={handleCloseModal}
 			footer={[
-				<Button key='cancel' onClick={closeModal}>
+				<Button key='cancel' onClick={handleCloseModal}>
 					Cancelar
 				</Button>,
 				<Button
@@ -127,7 +133,7 @@ const NursingModal = ({ closeModal, parameters, loadPatientQueue }) => {
 							})
 					}}
 				>
-					Ok
+					Aceptar
 				</Button>,
 			]}
 		>

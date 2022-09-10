@@ -20,6 +20,7 @@ export const LaboratoryTakeResults = () => {
 	const [tests, setTests] = useState([])
 	const [form] = Form.useForm()
 	const orderId = Form.useWatch('orderId', form)
+  
 	/**
 	 * Handler para obtener los valores de la orden seleccionada
 	 * Establece el valor de orderId en el form
@@ -138,7 +139,7 @@ export const LaboratoryTakeResults = () => {
 							const of = parseFloat(params.data.test.of)
 							const until = parseFloat(params.data.test.until)
 							console.log(value, of, until)
-							return !(value > of && value < until)
+							return !(value >= of && value <= until)
 								? { color: 'red' }
 								: null //Si no está en el rango pinta de rojo
 						} else if (params.data.test.operatorType === '<') {
@@ -146,22 +147,22 @@ export const LaboratoryTakeResults = () => {
 								params.data.test.operatorValue
 							)
 							return value < operatorValue
-								? { color: 'red' }
-								: null
+								? null
+								: { color: 'red' }
 						} else if (params.data.test.operatorType === '>') {
 							const operatorValue = parseFloat(
 								params.data.test.operatorValue
 							)
 							return value > operatorValue
-								? { color: 'red' }
-								: null
+								? null
+								: { color: 'red' }
 						} else if (params.data.test.operatorType === '=') {
 							const operatorValue = parseFloat(
 								params.data.test.operatorValue
 							)
 							return value === operatorValue
-								? { color: 'red' }
-								: null
+								? null
+								: { color: 'red' }
 						}
 					} else if (params.data.test.refValue === 'C') {
 						if (
@@ -183,11 +184,11 @@ export const LaboratoryTakeResults = () => {
 
 						if (!patientInfo.gender) return null
 						if (patientInfo.gender === 'Masculino')
-							return value > maleOf && value < maleUntil
+							return value >= maleOf && value <= maleUntil
 								? null
 								: { color: 'red' }
 						if (patientInfo.gender === 'Femenino')
-							return value > femaleOf && value < femaleUntil
+							return value >= femaleOf && value <= femaleUntil
 								? null
 								: { color: 'red' }
 					}

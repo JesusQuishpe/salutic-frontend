@@ -1,14 +1,16 @@
 import { Button, Card, Form, Input, message } from 'antd'
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import LoaderContext from '../../contexts/LoaderContext'
 import { axiosErrorHandler } from '../../handlers/axiosErrorHandler'
 import { RolService } from '../../services/RolService'
+import { ContentNotFound } from '../not-found/ContentNotFound'
 
 export const RolForm = () => {
 	const { rolId } = useParams()
 	const { openLoader, closeLoader } = useContext(LoaderContext)
 	const [form] = Form.useForm()
+	const [notFound, setNotFound] = useState(false)
 	const isEdit = !!rolId
 
 	const handleSubmit = async (values) => {
@@ -35,15 +37,28 @@ export const RolForm = () => {
 	}
 
 	const loadRolById = () => {
-		RolService.getById(rolId).then((rol) => {
-			form.setFieldValue('name', rol.name)
-		})
+		RolService.getById(rolId)
+			.then((rol) => {
+				form.setFieldValue('name', rol.name)
+			})
+			.catch((error) => {
+				console.log(error)
+				const { status } = axiosErrorHandler(error)
+				if (status && status === 404) {
+					setNotFound(true)
+				}
+			})
 	}
+
 	useEffect(() => {
 		if (isEdit) {
 			loadRolById()
 		}
 	}, [])
+
+	if (notFound) {
+		return <ContentNotFound />
+	}
 
 	return (
 		<Card title={isEdit ? 'Actualizar rol' : 'Crear rol'}>

@@ -1,6 +1,6 @@
 import { message } from 'antd'
-import { createContext, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { createContext, useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { axiosErrorHandler } from '../handlers/axiosErrorHandler'
 import { UserService } from '../services/UserService'
 
@@ -8,16 +8,22 @@ const UserContext = createContext()
 
 const UserProvider = ({ children }) => {
 	const navigate = useNavigate()
+	const location = useLocation()
 	const localUser = window.localStorage.getItem('user')
 	const userJSON = JSON.parse(localUser)
 	const [user, setUser] = useState(userJSON)
 	const [loading, setLoading] = useState(false)
+	const [hasPermission, setHasPermission] = useState(null)
 
 	const isLogged = Boolean(user)
+	const permissions = user?.permissions || []
+	console.log(user)
 
-	const login = (email, password) => {
+	const pathsWithAccess = permissions.map((per) => per.module.path)
+
+	const login = (username, password) => {
 		setLoading(true)
-		UserService.login(email, password)
+		UserService.login(username, password)
 			.then((user) => {
 				console.log(user)
 				//const newUser = camelizeKeys(user)
@@ -43,9 +49,23 @@ const UserProvider = ({ children }) => {
 		user,
 		loading,
 		isLogged,
+		hasPermission,
 		login,
 		logout,
 	}
+
+	useEffect(() => {
+		console.log(location)
+		if (location.pathname === '/') {
+			setHasPermission(true)
+		} else {
+			const value = pathsWithAccess.some((path) =>
+				location.pathname.includes(path)
+			)
+			console.log('Tiene permiso: ', value)
+			setHasPermission(value)
+		}
+	}, [location, user])
 
 	return <UserContext.Provider value={data}>{children}</UserContext.Provider>
 }

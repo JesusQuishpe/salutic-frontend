@@ -1,7 +1,7 @@
 import { Card, Col, Descriptions } from 'antd'
 import React from 'react'
-import QRCode from 'react-qr-code'
-import { END_POINT } from '../../utils/conf'
+//import QRCode from 'react-qr-code'
+//import { END_POINT } from '../../utils/conf'
 
 const PatientCard = ({ patient }) => {
 	return (
@@ -23,7 +23,7 @@ const PatientCard = ({ patient }) => {
 					<Descriptions.Item label='Domicilio'>
 						{patient.address}
 					</Descriptions.Item>
-					<Descriptions.Item label='Código QR'>
+					{/*<Descriptions.Item label='Código QR'>
 						{patient.identification && (
 							<a
 								href={END_POINT + `pacientes/${patient.id}/qr`}
@@ -37,7 +37,7 @@ const PatientCard = ({ patient }) => {
 								/>
 							</a>
 						)}
-					</Descriptions.Item>
+            </Descriptions.Item>*/}
 				</Descriptions>
 			</Card>
 		</Col>

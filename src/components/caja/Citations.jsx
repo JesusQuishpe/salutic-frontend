@@ -1,8 +1,6 @@
 import { FileAddOutlined, DeleteOutlined } from '@ant-design/icons'
 import { Link, Outlet } from 'react-router-dom'
 import Table from 'antd/lib/table'
-import CustomSearch from '../qr/CustomSearch'
-import { mapDataForTableAntDesign } from '../../utils/functions'
 import {
 	Button,
 	Card,
@@ -10,26 +8,31 @@ import {
 	DatePicker,
 	Divider,
 	Form,
+	Popconfirm,
 	Row,
 	Select,
 	Space,
+	Tag,
 } from 'antd'
 import { QRModal } from '../qr/QRModal'
 import { useFetchCitations } from '../../hooks/useFetchCitations'
+import CustomSearch from '../qr/CustomSearch'
+import { createDateFromString } from '../../utils/functions'
 
 const { Option } = Select
 
 export const Citations = () => {
-	const [form] = Form.useForm()
 	const {
-		page,
+		form,
+		inputRef,
 		citations,
 		loading,
-		visible,
-		onSearch,
-		onReload,
+		handleReload,
 		updatePage,
+		handleDeleteClick,
+		handleSubmitSearch,
 	} = useFetchCitations()
+
 	const columns = [
 		{
 			title: 'N° cita',
@@ -38,7 +41,7 @@ export const Citations = () => {
 		{
 			title: 'Paciente',
 			dataIndex: 'fullname',
-			responsive: ['md'],
+			responsive: ['xl'],
 		},
 		{
 			title: 'Area',
@@ -47,21 +50,45 @@ export const Citations = () => {
 		{
 			title: 'Fecha',
 			dataIndex: 'date',
+			responsive: ['lg'],
+			render: (_, record) => {
+				return createDateFromString(record.date).format('DD/MM/YYYY')
+			},
 		},
 		{
 			title: 'Hora',
 			dataIndex: 'hour',
+			responsive: ['xl'],
+		},
+		{
+			title: 'Estado',
+			dataIndex: 'attended',
 			responsive: ['md'],
+			render: (_, record) => {
+				if (record.attended === 1) {
+					return <Tag color='green'>Atendida</Tag>
+				} else {
+					return <Tag color='red'>Pendiente</Tag>
+				}
+			},
 		},
 		{
 			title: 'Acciones',
-			responsive: ['md'],
+
 			render: (_, record) => {
 				return (
 					<Space>
-						<Button type='primary' danger>
-							<DeleteOutlined />
-						</Button>
+						<Popconfirm
+							title='Está seguro de eliminar la cita?'
+							onConfirm={() => handleDeleteClick(record.id)}
+							okButtonProps={{
+								loading,
+							}}
+						>
+							<Button type='primary' danger>
+								<DeleteOutlined />
+							</Button>
+						</Popconfirm>
 					</Space>
 				)
 			},
@@ -87,12 +114,12 @@ export const Citations = () => {
 				</Link>
 			</div>
 			<Row gutter={[10, 10]}>
-				<Col lg={6} md={24} xs={24}>
+				<Col xs={24} lg={7} xl={6}>
 					<Card title='Filtros'>
 						<Form
 							form={form}
 							initialValues={{
-								stateFilter: 'pendientes',
+								stateFilter: null,
 								startDate: null,
 								endDate: null,
 							}}
@@ -102,14 +129,14 @@ export const Citations = () => {
 								<DatePicker
 									placeholder='Seleccione fecha'
 									style={{ width: '100%' }}
-									format='YYYY-MM-DD'
+									format='DD/MM/YYYY'
 								/>
 							</Form.Item>
 							<Form.Item label='Fecha final' name='endDate'>
 								<DatePicker
 									placeholder='Seleccione fecha'
 									style={{ width: '100%' }}
-									format='YYYY-MM-DD'
+									format='DD/MM/YYYY'
 								/>
 							</Form.Item>
 							<Divider />
@@ -117,7 +144,10 @@ export const Citations = () => {
 								label='Filtrar por estado'
 								name='stateFilter'
 							>
-								<Select placeholder='Seleccione un estado de la cita'>
+								<Select
+									placeholder='Seleccione un estado de la cita'
+									allowClear
+								>
 									<Option value='pendientes'>
 										Pendientes
 									</Option>
@@ -127,20 +157,23 @@ export const Citations = () => {
 						</Form>
 					</Card>
 				</Col>
-				<Col lg={18} md={24} xs={24}>
+				<Col lg={17} md={24} xs={24} xl={18}>
 					<CustomSearch
+						ref={inputRef}
 						placeholder='Buscar por número de cédula'
 						allowClear
 						disabled={loading}
-						onSearch={onSearch}
-						onReload={onReload}
+						onSearch={handleSubmitSearch}
+						onReload={handleReload}
+						showQrButton={false}
 					/>
 					<Table
 						columns={columns}
-						dataSource={mapDataForTableAntDesign(citations?.result)}
+						dataSource={citations?.result}
+						rowKey={(record) => record.id}
 						pagination={{
 							total: citations?.pagination?.total,
-							current: page,
+							current: citations?.pagination?.currentPage,
 							pageSize: citations?.pagination?.perPage,
 							onChange: updatePage,
 						}}
@@ -148,7 +181,7 @@ export const Citations = () => {
 					/>
 				</Col>
 			</Row>
-			{visible && <QRModal handleSearch={onSearch} />}
+			{/*{visible && <QRModal handleSearch={onSearch} />}*/}
 		</>
 	)
 }

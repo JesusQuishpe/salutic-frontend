@@ -62,6 +62,11 @@ export const ModalFormula = ({
 		closeModal()
 	}
 
+	const handleCancel = () => {
+		setFormula('')
+		closeModal()
+	}
+
 	useEffect(() => {
 		setFormula(testFormula)
 	}, [testFormula])
@@ -72,7 +77,7 @@ export const ModalFormula = ({
 			okText='Guardar'
 			cancelText='Cancelar'
 			visible={show}
-			onCancel={closeModal}
+			onCancel={handleCancel}
 			onOk={handleOk}
 			width={1000}
 		>
@@ -92,6 +97,7 @@ export const ModalFormula = ({
 						onSearch={(value) => setFilterText(value)}
 					/>
 					<Table
+						size='small'
 						columns={columns}
 						dataSource={tests.filter((test) =>
 							test.name

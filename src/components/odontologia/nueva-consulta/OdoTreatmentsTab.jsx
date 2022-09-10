@@ -74,7 +74,7 @@ const OdoTreatmentsTab = ({ treatmentsFromDB, update }) => {
 	}
 
 	const handleEditClick = () => {
-		console.log(treatments)
+		if (!selectedRow) return
 		setModalParams({
 			show: true,
 			data: selectedRow,
@@ -99,7 +99,6 @@ const OdoTreatmentsTab = ({ treatmentsFromDB, update }) => {
 
 	const rowSelection = {
 		onChange: (_, selectedRows) => {
-			console.log(selectedRows)
 			const record = selectedRows[0]
 			setSelectedRow(record)
 		},

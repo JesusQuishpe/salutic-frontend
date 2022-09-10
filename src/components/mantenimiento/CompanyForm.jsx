@@ -1,12 +1,23 @@
-import { Button, Card, Form, Input, Row, TimePicker, Upload } from 'antd'
+import {
+	Button,
+	Card,
+	Form,
+	Input,
+	message,
+	Row,
+	TimePicker,
+	//Upload,
+} from 'antd'
 import React, { useEffect } from 'react'
-import { UploadOutlined } from '@ant-design/icons'
+//import { UploadOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { CompanyService } from '../../services/CompanyService'
 import { parseHour } from '../../utils/functions'
 import useUser from '../../hooks/useUser'
+import { useLoader } from '../../hooks/useLoader'
+import { axiosErrorHandler } from '../../handlers/axiosErrorHandler'
 
-const normFile = (e) => {
+/*const normFile = (e) => {
 	console.log('Upload event:', e)
 
 	if (Array.isArray(e)) {
@@ -14,9 +25,10 @@ const normFile = (e) => {
 	}
 
 	return e?.fileList
-}
+}*/
 
 export const CompanyForm = () => {
+	const { openLoader, closeLoader } = useLoader()
 	const { user } = useUser()
 	const [form] = Form.useForm()
 
@@ -28,19 +40,20 @@ export const CompanyForm = () => {
 		phone: '',
 		startHour: null,
 		endHour: null,
-		logo: null,
+		//logo: null,
 	}
 
 	const onFinish = async (values) => {
 		try {
+			openLoader('Guardando cambios...')
 			const endHour = parseHour(values.endHour)
 			const startHour = parseHour(values.startHour)
-			const logo = values.logo ? values.logo[0].originFileObj : null
+			//const logo = values.logo ? values.logo[0].originFileObj : null
 			const { longName, shortName, email, phone, address } = values
 			//const data={ ...values,logo, startHour, endHour }
 			const data = new FormData()
 			data.append('_method', 'PUT') //enviamos el metodo para que laravel identifique que es put
-			data.append('logo', logo)
+			//data.append('logo', logo)
 			data.append(
 				'data',
 				JSON.stringify({
@@ -60,13 +73,19 @@ export const CompanyForm = () => {
 				user.companyId
 			)
 			console.log(response)
+			message.success('Datos guardados correctamente')
 		} catch (error) {
 			console.log(error)
+			const { message: errorMessage } = axiosErrorHandler(error)
+			message.error(errorMessage)
+		} finally {
+			closeLoader()
 		}
 	}
 
 	const loadCompanyInfo = async (id) => {
 		try {
+			openLoader('Cargando...')
 			const data = await CompanyService.getById(id)
 			form.setFieldsValue({
 				longName: data.longName,
@@ -78,11 +97,15 @@ export const CompanyForm = () => {
 					? moment(data.startHour, 'H:m:s')
 					: null,
 				endHour: data.endHour ? moment(data.endHour, 'H:m:s') : null,
-				logo: null,
+				//logo: null,
 			})
 			console.log(data)
 		} catch (error) {
 			console.log(error)
+			const { message: errorMessage } = axiosErrorHandler(error)
+			message.error(errorMessage)
+		} finally {
+			closeLoader()
 		}
 	}
 
@@ -113,17 +136,23 @@ export const CompanyForm = () => {
 				<Form.Item
 					label='Nombre completo de la clinica'
 					name='longName'
+					rules={[
+						{ required: true, message: 'El campo es requerido' },
+					]}
 				>
-					<Input maxLength={50} />
+					<Input maxLength={100} />
 				</Form.Item>
 				<Form.Item
 					label='Nombre corto de la clinica'
 					extra='Max. 20 caracteres'
 					name='shortName'
+					rules={[
+						{ required: true, message: 'El campo es requerido' },
+					]}
 				>
 					<Input maxLength={20} />
 				</Form.Item>
-				<Form.Item
+				{/*<Form.Item
 					label='Logo'
 					name='logo'
 					valuePropName='fileList'
@@ -142,26 +171,56 @@ export const CompanyForm = () => {
 							Click para subir
 						</Button>
 					</Upload>
+      </Form.Item>*/}
+				<Form.Item
+					label='Dirección'
+					name='address'
+					rules={[
+						{ required: true, message: 'El campo es requerido' },
+					]}
+				>
+					<Input maxLength={150} />
 				</Form.Item>
-				<Form.Item label='Dirección' name='address'>
-					<Input />
-				</Form.Item>
-				<Form.Item label='Teléfono' name='phone'>
-					<Input />
+				<Form.Item
+					label='Teléfono'
+					name='phone'
+					rules={[
+						{ required: true, message: 'El campo es requerido' },
+					]}
+				>
+					<Input maxLength={10} />
 				</Form.Item>
 
-				<Form.Item label='Correo electrónico' name='email'>
-					<Input />
+				<Form.Item
+					label='Correo electrónico'
+					name='email'
+					rules={[
+						{ required: true, message: 'El campo es requerido' },
+					]}
+				>
+					<Input maxLength={150} />
 				</Form.Item>
 
-				<Form.Item label='Hora de inicio' name='startHour'>
+				<Form.Item
+					label='Hora de inicio'
+					name='startHour'
+					rules={[
+						{ required: true, message: 'El campo es requerido' },
+					]}
+				>
 					<TimePicker
 						use12Hours
 						format='h:mm a'
 						placeholder='Selecciona la hora'
 					/>
 				</Form.Item>
-				<Form.Item label='Hora de cierre' name='endHour'>
+				<Form.Item
+					label='Hora de cierre'
+					name='endHour'
+					rules={[
+						{ required: true, message: 'El campo es requerido' },
+					]}
+				>
 					<TimePicker
 						use12Hours
 						format='h:mm a'

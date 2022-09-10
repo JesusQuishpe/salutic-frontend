@@ -1,5 +1,5 @@
 import { Button, Col, Form, Input, Row } from 'antd'
-import LogoSoftware from '../../assets/png/logo-software.png'
+import PrefecturaLogo from '../../assets/png/prefectura-logo.png'
 import useUser from '../../hooks/useUser'
 
 export const Login = () => {
@@ -7,10 +7,10 @@ export const Login = () => {
 	const { login } = useUser()
 
 	const onFinish = () => {
-		const { email, password } = form.getFieldsValue()
-		console.log(email, password)
+		const { username, password } = form.getFieldsValue()
+		console.log(username, password)
 		try {
-			login(email, password)
+			login(username, password)
 		} catch (error) {
 			console.log(error)
 		}
@@ -33,22 +33,22 @@ export const Login = () => {
 					//  onFinishFailed={onFinishFailed}
 					autoComplete='on'
 				>
-					<Row justify='center' className='mb-3'>
+					<Row justify='center' style={{ marginBottom: '10px' }}>
 						<Col>
 							<img
-								src={LogoSoftware}
+								src={PrefecturaLogo}
 								width={300}
 								alt='Logo.png'
 							/>
 						</Col>
 					</Row>
 					<Form.Item
-						label='Correo electrónico'
-						name='email'
+						label='Nombre de usuario'
+						name='username'
 						rules={[
 							{
 								required: true,
-								message: 'Ingresa un correo electrónico!',
+								message: 'Ingresa el nombre de usuario!',
 							},
 						]}
 					>

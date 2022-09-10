@@ -1,3 +1,4 @@
+import axios from 'axios'
 import _, { isEmpty } from 'lodash'
 import moment from 'moment'
 
@@ -113,6 +114,15 @@ const dataURLtoFile = (dataurl, filename) => {
 	})
 }
 
+const fetchImage = async ({ url, filename }) => {
+	const imageBlob = await axios.get(url, {
+		//mode: 'no-cors',
+		responseType: 'blob',
+	})
+	const file = new File([imageBlob], filename)
+	return file
+}
+
 export {
 	camelizeKeys,
 	snakelizeKeys,
@@ -128,4 +138,5 @@ export {
 	isObjectEmpty,
 	dataURLtoFile,
 	createDateFromString,
+	fetchImage,
 }

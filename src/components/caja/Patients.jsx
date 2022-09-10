@@ -1,4 +1,4 @@
-import { Button, Space, Table } from 'antd'
+import { Button, Popconfirm, Space, Table } from 'antd'
 import {
 	DeleteOutlined,
 	FileAddOutlined,
@@ -11,8 +11,16 @@ import { QRModal } from '../qr/QRModal'
 import { useFetchPatients } from '../../hooks/useFetchPatients'
 
 export const Patients = () => {
-	const { patients, loading, visible, onSearch, onReload, updatePage } =
-		useFetchPatients()
+	const {
+		patients,
+		loading,
+		visible,
+		onSearch,
+		onReload,
+		updatePage,
+		deleteRecord,
+	} = useFetchPatients()
+
 	const columns = [
 		{
 			title: 'Id',
@@ -46,9 +54,17 @@ export const Patients = () => {
 								<EditOutlined />
 							</Button>
 						</Link>
-						<Button type='primary' danger>
-							<DeleteOutlined />
-						</Button>
+						<Popconfirm
+							title='Está seguro de eliminar el paciente?'
+							onConfirm={() => deleteRecord(record.id)}
+							okButtonProps={{
+								loading,
+							}}
+						>
+							<Button type='primary' danger>
+								<DeleteOutlined />
+							</Button>
+						</Popconfirm>
 					</Space>
 				)
 			},
@@ -78,13 +94,14 @@ export const Patients = () => {
 				disabled={loading}
 				onSearch={onSearch}
 				onReload={onReload}
+				showQrButton={false}
 			/>
 			<Table
 				columns={columns}
 				dataSource={mapDataForTableAntDesign(patients?.result)}
 				pagination={{
 					total: patients?.pagination?.total,
-					current: patients?.pagination.currentPage,
+					current: patients?.pagination?.currentPage,
 					pageSize: patients?.pagination?.perPage,
 					onChange: updatePage,
 				}}

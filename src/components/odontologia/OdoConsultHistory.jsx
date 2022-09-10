@@ -1,13 +1,4 @@
-import {
-	Button,
-	Card,
-	DatePicker,
-	Form,
-	Popconfirm,
-	Row,
-	Space,
-	Table,
-} from 'antd'
+import { Button, Card, Popconfirm, Space, Table } from 'antd'
 import React from 'react'
 
 import {
@@ -16,14 +7,20 @@ import {
 	FilePdfOutlined,
 } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
-import CustomSearch from '../../qr/CustomSearch'
-import { useFetchOdontologyHistory } from '../../../hooks/useFetchOdontologyHistory'
-import { END_POINT } from '../../../utils/conf'
+import { useFetchOdontologyHistory } from '../../hooks/useFetchOdontologyHistory'
+import CustomFilterSearch from '../qr/CustomFilterSearch'
+import { END_POINT } from '../../utils/conf'
+import { createDateFromString } from '../../utils/functions'
 
 export const OdoConsultHistory = () => {
-	const [form] = Form.useForm()
-	const { results, loading, handleDeleteClick, searchResults } =
-		useFetchOdontologyHistory()
+	const {
+		formRef,
+		results,
+		loading,
+		handleDeleteClick,
+		handleSubmitSearch,
+		updatePage,
+	} = useFetchOdontologyHistory()
 
 	const columns = [
 		{
@@ -37,6 +34,10 @@ export const OdoConsultHistory = () => {
 		{
 			title: 'Fecha',
 			dataIndex: 'date',
+			render: (_, record) => {
+				console.log(record)
+				return createDateFromString(record.date).format('DD/MM/YYYY')
+			},
 		},
 		{
 			title: 'Hora',
@@ -61,7 +62,7 @@ export const OdoConsultHistory = () => {
 						</Link>
 						<Popconfirm
 							title='Está seguro de eliminar?'
-							onConfirm={() => handleDeleteClick(record.id)}
+							onConfirm={() => handleDeleteClick(record.recId)}
 							okButtonProps={{
 								loading,
 							}}
@@ -79,27 +80,26 @@ export const OdoConsultHistory = () => {
 
 	return (
 		<>
-			{/*<Row style={{ marginBottom: '10px' }}>
-				<Form layout='inline' form={form}>
-					<Form.Item label='Desde' name='startDate'>
-						<DatePicker />
-					</Form.Item>
-					<Form.Item label='Hasta' name='endDate'>
-						<DatePicker />
-					</Form.Item>
-				</Form>
-  </Row>*/}
-			<Card title='Consultar historial clínico'>
-				<CustomSearch
-					placeholder='Buscar por número de cédula'
-					onSearch={searchResults}
-					showReloadButton={false}
-					allowClear
-				/>
+			<h2>Consultar historial</h2>
+			<CustomFilterSearch
+				ref={formRef}
+				placeholder='Cédula del paciente'
+				allowClear
+				onSearch={handleSubmitSearch}
+				cardType='inner'
+			/>
+			<Card title='Resultados' type='inner'>
 				<Table
 					columns={columns}
-					dataSource={results}
+					dataSource={results?.result}
 					rowKey={(record) => record.appoId}
+					loading={loading}
+					pagination={{
+						total: results?.pagination?.total || 0,
+						current: results?.pagination?.currentPage || 1,
+						pageSize: results?.pagination?.perPage || 10,
+						onChange: updatePage,
+					}}
 				/>
 			</Card>
 		</>

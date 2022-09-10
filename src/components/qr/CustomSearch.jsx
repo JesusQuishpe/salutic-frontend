@@ -1,34 +1,45 @@
 import { Button, Col, Form, Input, Row } from 'antd'
 import { QrcodeOutlined } from '@ant-design/icons'
 import QrModalContext from '../../contexts/QrModalContext'
-import { useContext } from 'react'
+import { useContext, forwardRef, useState, useImperativeHandle } from 'react'
 
-const CustomSearch = ({
-	onSearch,
-	onReload,
-	placeholder,
-	allowClear,
-	disabled,
-	showQrButton = true,
-	showReloadButton = true,
-}) => {
+const CustomSearch = (
+	{
+		onSearch,
+		onReload,
+		placeholder,
+		allowClear,
+		disabled,
+		showQrButton = true,
+		showReloadButton = true,
+	},
+	ref
+) => {
 	const { openModal } = useContext(QrModalContext)
 	const [form] = Form.useForm()
+	const [inputValue, setInputValue] = useState('')
 
 	const onReloadClick = () => {
 		form.setFieldsValue({ search: '' })
+		setInputValue('')
 		if (onReload) {
 			onReload()
 		}
 	}
 
+	useImperativeHandle(ref, () => inputValue, [inputValue])
 	return (
 		<Row gutter={2} wrap={false}>
 			<Col flex={5}>
 				<Form form={form}>
 					<Form.Item name='search'>
 						<Input.Search
-							onSearch={onSearch}
+							onSearch={(value) => {
+								setInputValue(value)
+								if (value && onSearch) {
+									onSearch(value)
+								}
+							}}
 							placeholder={placeholder}
 							allowClear={allowClear}
 							disabled={disabled}
@@ -63,4 +74,4 @@ const CustomSearch = ({
 }
 
 CustomSearch.displayName = 'CustomSearch'
-export default CustomSearch
+export default forwardRef(CustomSearch)

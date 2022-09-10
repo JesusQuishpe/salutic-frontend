@@ -1,5 +1,12 @@
 import { Alert, Button, Form, Row, Space, message } from 'antd'
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import {
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+	useRef,
+} from 'react'
 import { Link } from 'react-router-dom'
 import LoaderContext from '../../contexts/LoaderContext'
 import QrModalContext from '../../contexts/QrModalContext'
@@ -14,18 +21,7 @@ import NewCitationCard from './NewCitationCard'
 import { QRModal } from '../qr/QRModal'
 import TestTable from './TestTable'
 import { CitationService } from '../../services/CitationService'
-
-const getItem = ({ id, code, price, key, title, icon, children }) => {
-	return {
-		id,
-		code,
-		price,
-		key,
-		title,
-		icon,
-		children,
-	}
-}
+import { axiosErrorHandler } from '../../handlers/axiosErrorHandler'
 
 const getAreasMapped = (areas) => {
 	return areas.map((area) => {
@@ -44,6 +40,16 @@ const getAreasMapped = (areas) => {
 							code: test.code,
 							price: test.price,
 							title: test.name,
+							area: {
+								name: area.name,
+								code: area.code,
+								key: `area-${area.id}`,
+							},
+							group: {
+								name: group.name,
+								code: group.code,
+								key: `group-${group.id}`,
+							},
 							key: `test-${test.id}`,
 						}
 					}),
@@ -54,13 +60,11 @@ const getAreasMapped = (areas) => {
 }
 
 export const NewCitation = () => {
-	//Custom hook
 	const { user } = useUser()
-	//Contexts
-	//const { openToast } = useContext(ToastContext)
 	const { openLoader, closeLoader } = useContext(LoaderContext)
 	const { visible } = useContext(QrModalContext)
 	//States
+	const selectedTests = useRef([])
 	const [form] = Form.useForm()
 	const [areas, setAreas] = useState([])
 	const [showLaboratorioInfo, setShowLaboratorioInfo] = useState(false)
@@ -90,22 +94,26 @@ export const NewCitation = () => {
 					)
 
 				if (item.children) {
-					return getItem({
+					return {
 						id: item.id,
 						code: item.code,
 						price: item.price,
 						key: item.key,
 						title,
+						area: item.area,
+						group: item.group,
 						children: loop(item.children),
-					})
+					}
 				}
-				return getItem({
+				return {
 					id: item.id,
 					code: item.code,
 					price: item.price,
 					key: item.key,
 					title,
-				})
+					area: item.area,
+					group: item.group,
+				}
 			})
 		}
 		return loop(areasMapped)
@@ -126,6 +134,7 @@ export const NewCitation = () => {
 		async (values) => {
 			try {
 				console.log(values)
+				console.log(selectedTests.current)
 				if (!patient.id) {
 					setShowPatientNotFoundAlert(true)
 					return
@@ -135,10 +144,11 @@ export const NewCitation = () => {
 					...values,
 					patientId: patient.id,
 					userId: user?.id,
-					tests: testsOfPatient,
+					tests: selectedTests.current,
 				})
 				form.resetFields()
 				setTestsOfPatient([])
+				selectedTests.current = []
 				message.success('Cita creada')
 			} catch (error) {
 				console.log(error)
@@ -156,36 +166,101 @@ export const NewCitation = () => {
 
 	const addTest = useCallback(
 		(testParam) => {
-			const index = testsOfPatient.findIndex(
-				(test) => test.id === testParam.id
+			const newTests = [...testsOfPatient]
+			const area = newTests.find(
+				(area) => area.code === testParam.area.code
 			)
-			const newTests = [
-				...testsOfPatient,
-				{ key: testParam.id, ...testParam },
-			]
-			console.log(newTests)
-			if (index < 0) {
-				const total = newTests.reduce((acc, current) => {
-					return acc + (current.price ?? 0)
-				}, 0)
-				console.log(total)
-				const values = form.getFieldsValue()
-				form.setFieldsValue({ ...values, value: total })
+			if (!area) {
+				const newArea = {
+					key: testParam.area.key,
+					code: testParam.area.code,
+					name: testParam.area.name,
+					price: 0,
+					children: [
+						{
+							code: testParam.group.code,
+							name: testParam.group.name,
+							price: 0,
+							key: testParam.group.key,
+							children: [testParam],
+						},
+					],
+				}
+				newTests.push(newArea)
+				selectedTests.current.push(testParam)
 				setTestsOfPatient(newTests)
+				console.log(selectedTests)
 			}
+			if (area) {
+				const group = area.children.find(
+					(group) => group.code === testParam.group.code
+				)
+
+				if (group) {
+					const index = group.children.findIndex(
+						(test) => test.code === testParam.code
+					)
+
+					if (index < 0) {
+						//No permite tests duplicados
+						group.children.push(testParam)
+						selectedTests.current.push(testParam)
+						setTestsOfPatient(newTests)
+					}
+				} else {
+					//Si no existe el grupo, se agregar el grupo con el test pasado por parametro
+					area.children.push({
+						code: testParam.group.code,
+						name: testParam.group.name,
+						key: testParam.group.key,
+						children: [testParam],
+					})
+					selectedTests.current.push(testParam)
+					setTestsOfPatient(newTests)
+				}
+			}
+			const total = selectedTests.current.reduce((acc, current) => {
+				return acc + (current.price ?? 0)
+			}, 0)
+			form.setFieldValue('value', total)
 		},
 		[testsOfPatient]
 	)
 
 	const deleteTest = useCallback(
-		(id) => {
-			const newTests = testsOfPatient.filter((test) => test.id !== id)
-			const total = newTests.reduce((acc, current) => {
-				return acc + (current.price ?? 0)
-			}, 0)
-			const values = form.getFieldsValue()
-			form.setFieldsValue({ ...values, value: total })
-			setTestsOfPatient(newTests)
+		(record) => {
+			const newTests = [...testsOfPatient]
+			const areaIndex = newTests.findIndex(
+				(area) => area.code === record.area.code
+			)
+			const area = newTests[areaIndex]
+			const groupIndex = area.children.findIndex(
+				(group) => group.code === record.group.code
+			)
+			if (groupIndex >= 0) {
+				const group = area.children[groupIndex]
+				const filterTests = group.children.filter(
+					(test) => test.code !== record.code
+				)
+				if (filterTests.length === 0) {
+					//Si se eliminaron todos los test del grupo, entonces se borra el grupo tambien
+					area.children.splice(groupIndex, 1)
+					if (area.children.length === 0) {
+						newTests.splice(areaIndex, 1)
+					}
+				} else {
+					group.children = filterTests
+				}
+
+				setTestsOfPatient(newTests)
+				selectedTests.current = selectedTests.current.filter(
+					(test) => test.code !== record.code
+				)
+				const total = selectedTests.current.reduce((acc, current) => {
+					return acc + (current.price ?? 0)
+				}, 0)
+				form.setFieldValue('value', total)
+			}
 		},
 		[testsOfPatient]
 	)
@@ -193,10 +268,18 @@ export const NewCitation = () => {
 	const onNodeClick = useCallback(
 		(e, node) => {
 			console.log(e, node)
-			const { id, code, title, price, children } = node
+			const { id, code, title, price, children, area, group } = node
 			const strTitle = title.props.children
 			if (typeof children === 'undefined' && showLaboratorioInfo)
-				addTest({ id, code, name: strTitle, price })
+				addTest({
+					id,
+					code,
+					name: strTitle,
+					price,
+					area,
+					group,
+					key: `test-${id}`,
+				})
 		},
 		[addTest, showLaboratorioInfo]
 	)
@@ -213,10 +296,8 @@ export const NewCitation = () => {
 			setPatient({ ...patient })
 			closeLoader()
 		} catch (error) {
-			if (error.response.status === 404) {
-				alert('Registro no encontrado')
-			}
-			console.log(error)
+			const { message: errorMessage } = axiosErrorHandler(error)
+			message.error(errorMessage)
 		} finally {
 			closeLoader()
 		}
@@ -234,7 +315,7 @@ export const NewCitation = () => {
 						<h2>Nueva cita</h2>
 						<Row justify='end' style={{ marginBottom: 20 }}>
 							<Space>
-								<Link to={'/pacientes/nuevo'}>
+								<Link to={'/caja/pacientes/nuevo'}>
 									<Button type='primary'>
 										Nuevo paciente
 									</Button>
@@ -253,6 +334,8 @@ export const NewCitation = () => {
 							onSearch={searchByQR}
 							allowClear
 							placeholder={'Buscar paciente por número de cédula'}
+							showQrButton={false}
+							showReloadButton={false}
 						/>
 						{!hiddenAlert && (
 							<Alert

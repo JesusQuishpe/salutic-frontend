@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+//import * as path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [react()],
-	base: 'http://localhost/tesis-final/backend/public/dist/',
+	/*resolve: {
+		alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
+	},*/
+	base: 'http://177.234.236.242/',
 })

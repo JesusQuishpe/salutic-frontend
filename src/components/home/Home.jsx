@@ -1,62 +1,67 @@
 import {
 	MenuUnfoldOutlined,
 	MenuFoldOutlined,
-	ScheduleOutlined,
 	DesktopOutlined,
 	MedicineBoxOutlined,
 	ExperimentOutlined,
-	ReconciliationOutlined,
 	ToolOutlined,
 	LogoutOutlined,
+	DownOutlined,
 } from '@ant-design/icons'
-import { Button, Layout, Menu, Spin } from 'antd'
+import { Dropdown, Layout, Menu, Space } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { ModuleService } from '../../services/ModuleService'
 import useUser from '../../hooks/useUser'
-import { useLoader } from '../../hooks/useLoader'
 import { CustomSpin } from '../antd/CustomSpin'
+import { VerifyPermissions } from './VerifyPermissions'
+import OdontologyIcon from '../icons/OdontologyIcon'
+import StethoscopeIcon from '../icons/StethoscopeIcon'
+import PrefecturaLogo from '../../assets/png/prefectura-logo.png'
 
 const { Header, Sider, Content } = Layout
 
-function getItem(label, key, icon, children) {
+function getItem(label, key, icon, children, disabled = false) {
 	return {
 		key,
 		icon,
 		children,
 		label,
+		disabled,
 	}
 }
 
 export const Home = () => {
 	const { user, logout } = useUser()
-
 	const [modules, setModules] = useState([])
 	const [collapsed, setCollapsed] = useState(false)
 
 	const getIcon = (name) => {
 		if (name === 'Caja') return <DesktopOutlined />
-		if (name === 'Enfermeria') return <ReconciliationOutlined />
+		if (name === 'Enfermeria') return <StethoscopeIcon />
 		if (name === 'Medicina') return <MedicineBoxOutlined />
 		if (name === 'Laboratorio') return <ExperimentOutlined />
 		if (name === 'Mantenimiento') return <ToolOutlined />
-		if (name === 'Odontologia') return <ScheduleOutlined />
+		if (name === 'Odontologia') return <OdontologyIcon />
 		if (name === 'Cerrar') return <LogoutOutlined />
 	}
 
 	const buildItems = (modules, permissions = []) => {
+		console.log(modules)
 		if (!modules) return []
 		const items = modules.map((module) => {
-			const submodules = permissions.filter(
-				(per) => per.module.parentId === module.id
-			)
-			const children = submodules
-				? submodules.map((sub) => {
+			const children = module.submodules
+				? module.submodules.map((sub) => {
+						const hasPermission = permissions.some(
+							(per) => per.module.path === sub.path
+						)
+						//console.log(sub.name + ':', hasPermission)
 						return getItem(
-							<NavLink to={sub.module.path}>
-								{sub.module.name}
-							</NavLink>,
-							`sub-${sub.module.id}`
+							<NavLink to={sub.path}>{sub.name}</NavLink>,
+							`sub-${sub.id}`,
+							undefined,
+							undefined,
+							!hasPermission
 						)
 				  })
 				: []
@@ -84,9 +89,22 @@ export const Home = () => {
 		loadModules()
 	}, [])
 
-	const handleLogoutClick = () => {
+	const handleLogoutClick = (e) => {
+		e.preventDefault()
 		logout()
 	}
+
+	const menu = (
+		<Menu
+			items={[
+				{
+					key: '1',
+					label: <a onClick={handleLogoutClick}>Cerrar sesión</a>,
+				},
+			]}
+		/>
+	)
+
 	return (
 		<Layout style={{ minHeight: '100vh' }}>
 			<Sider
@@ -103,7 +121,9 @@ export const Home = () => {
 				collapsible
 				collapsed={collapsed}
 			>
-				<div className='logo' />
+				<div className='logo'>
+					<img src={PrefecturaLogo} />
+				</div>
 				<Menu
 					theme='dark'
 					mode='inline'
@@ -125,9 +145,14 @@ export const Home = () => {
 							onClick: () => setCollapsed(!collapsed),
 						}
 					)}
-					<Button type='link' onClick={handleLogoutClick}>
-						Cerrar sesión
-					</Button>
+					<Dropdown overlay={menu} className='user-name'>
+						<a onClick={(e) => e.preventDefault()}>
+							<Space>
+								Bienvenid@ {user.name}
+								<DownOutlined />
+							</Space>
+						</a>
+					</Dropdown>
 				</Header>
 				<Content
 					className='site-layout-content-background'
@@ -137,7 +162,9 @@ export const Home = () => {
 						minHeight: 280,
 					}}
 				>
-					<Outlet />
+					<VerifyPermissions>
+						<Outlet />
+					</VerifyPermissions>
 					<CustomSpin />
 				</Content>
 			</Layout>

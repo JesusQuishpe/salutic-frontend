@@ -1,19 +1,29 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Form, Input, Row, Card, Col, Button, message, Select } from 'antd'
+import {
+	Form,
+	Input,
+	Row,
+	Card,
+	Col,
+	Button,
+	message,
+	Select,
+	Checkbox,
+} from 'antd'
 import { useParams } from 'react-router-dom'
 import LoaderContext from '../../contexts/LoaderContext'
 import { axiosErrorHandler } from '../../handlers/axiosErrorHandler'
 import { AreaService } from '../../services/AreaService'
 import { GroupService } from '../../services/GroupService'
 import { CustomInputNumber } from '../antd/CustomInputNumber'
-
-const { Option } = Select
+import { ContentNotFound } from '../not-found/ContentNotFound'
 
 const initialForm = {
 	code: '',
 	name: '',
 	areaId: null,
 	price: 0,
+	showAtPrint: false,
 }
 
 export const GroupForm = () => {
@@ -21,6 +31,7 @@ export const GroupForm = () => {
 	const [form] = Form.useForm()
 	const { groupId } = useParams()
 	const [areas, setAreas] = useState([])
+	const [notFound, setNotFound] = useState(false)
 	const isEdit = !!groupId
 
 	const loadAreas = () => {
@@ -43,13 +54,19 @@ export const GroupForm = () => {
 	 */
 	const handleSubmit = async (values) => {
 		try {
-			console.log(values)
+			//console.log(values)
 			openLoader(isEdit ? 'Actualizando datos...' : 'Creando grupo...')
 			const data = { ...values }
-			console.log(data)
+			//console.log(data)
 			if (!isEdit) {
 				await GroupService.createGroup(data)
-				form.resetFields(['code', 'areaId', 'name', 'price'])
+				form.resetFields([
+					'code',
+					'areaId',
+					'name',
+					'price',
+					'showAtPrint',
+				])
 				message.success('Datos creados correctamente')
 			} else {
 				await GroupService.updateGroup(data, groupId)
@@ -69,14 +86,23 @@ export const GroupForm = () => {
 	 * @param {number} id identificador del group
 	 */
 	const getGroupById = async (id) => {
-		const group = await GroupService.getById(id)
-		console.log(group)
-		form.setFieldsValue({
-			name: group.name,
-			areaId: group.area.id,
-			code: group.code,
-			price: group.price,
-		})
+		try {
+			const group = await GroupService.getById(id)
+			//console.log(group)
+			form.setFieldsValue({
+				name: group.name,
+				areaId: group.area.id,
+				code: group.code,
+				price: group.price,
+				showAtPrint: group.showAtPrint === 1,
+			})
+		} catch (error) {
+			console.log(error)
+			const { status } = axiosErrorHandler(error)
+			if (status && status === 404) {
+				setNotFound(true)
+			}
+		}
 	}
 
 	useEffect(() => {
@@ -88,6 +114,10 @@ export const GroupForm = () => {
 			getGroupById(groupId)
 		}
 	}, [isEdit])
+
+	if (notFound) {
+		return <ContentNotFound />
+	}
 
 	return (
 		<Row style={{ width: '100%' }}>
@@ -155,6 +185,13 @@ export const GroupForm = () => {
 								allowClear
 								options={areas}
 							/>
+						</Form.Item>
+						<Form.Item
+							label='Mostrar nombre en PDF'
+							name='showAtPrint'
+							valuePropName='checked'
+						>
+							<Checkbox />
 						</Form.Item>
 						<Form.Item
 							label='Precio'

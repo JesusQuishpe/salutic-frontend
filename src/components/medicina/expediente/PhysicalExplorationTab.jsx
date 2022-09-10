@@ -1,8 +1,39 @@
-import { Input, Tabs } from 'antd'
+import { Col, Input, Popover, Row, Tabs } from 'antd'
 import React from 'react'
 import { updatePhysicalExploration } from '../../../store/slices/expedient/expedientSlice'
 import { connect } from 'react-redux'
+import { QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import {
+	infoChest,
+	infoExtremities,
+	infoGenitals,
+	infoGynecological,
+	infoHabitusExterior,
+	infoHead,
+	infoNeck,
+	infoNeurologicalExploration,
+	infoSpine,
+} from './PhysicalExplorationInfo'
 const { TabPane } = Tabs
+
+export const LabelWithInfo = ({ label, popoverContent, showIcon = true }) => {
+	return (
+		<Row style={{ paddingBottom: '8px' }} align='middle' gutter={5}>
+			<Col span={'auto'}>{label} </Col>
+			<Col flex={'none'}>
+				{showIcon && (
+					<Popover
+						title='Información'
+						content={popoverContent}
+						placement='right'
+					>
+						<InfoCircleOutlined />
+					</Popover>
+				)}
+			</Col>
+		</Row>
+	)
+}
 
 const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 	const updateForm = (e) => {
@@ -13,6 +44,10 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 	return (
 		<Tabs tabPosition='left' defaultActiveKey='patologicos'>
 			<TabPane tab='Habitus exterior' key='outerHabitus'>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={infoHabitusExterior}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='outerHabitus'
@@ -21,6 +56,7 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 				/>
 			</TabPane>
 			<TabPane tab='Cabeza' key='head'>
+				<LabelWithInfo label='Descripción' popoverContent={infoHead} />
 				<Input.TextArea
 					rows={30}
 					name='head'
@@ -29,6 +65,11 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 				/>
 			</TabPane>
 			<TabPane tab='Ojos' key='eyes'>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={null}
+					showIcon={false}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='eyes'
@@ -37,6 +78,11 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 				/>
 			</TabPane>
 			<TabPane tab='Otorrinolaringología' key='otorhinolaryngology'>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={null}
+					showIcon={false}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='otorhinolaryngology'
@@ -45,6 +91,7 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 				/>
 			</TabPane>
 			<TabPane tab='Cuello' key='neck'>
+				<LabelWithInfo label='Descripción' popoverContent={infoNeck} />
 				<Input.TextArea
 					rows={30}
 					name='neck'
@@ -53,6 +100,7 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 				/>
 			</TabPane>
 			<TabPane tab='Torax' key='chest'>
+				<LabelWithInfo label='Descripción' popoverContent={infoChest} />
 				<Input.TextArea
 					rows={30}
 					name='chest'
@@ -61,6 +109,11 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 				/>
 			</TabPane>
 			<TabPane tab='Abdomen' key='abdomen'>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={null}
+					showIcon={false}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='abdomen'
@@ -72,6 +125,10 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 				tab='Exploracion ginecológica'
 				key='gynecologicalExamination'
 			>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={infoGynecological}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='gynecologicalExamination'
@@ -80,6 +137,10 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 				/>
 			</TabPane>
 			<TabPane tab='Genitales' key='genitals'>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={infoGenitals}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='genitals'
@@ -88,6 +149,7 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 				/>
 			</TabPane>
 			<TabPane tab='Columna vertebral' key='spine'>
+				<LabelWithInfo label='Descripción' popoverContent={infoSpine} />
 				<Input.TextArea
 					rows={30}
 					name='spine'
@@ -96,6 +158,10 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 				/>
 			</TabPane>
 			<TabPane tab='Extremidades' key='extremities'>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={infoExtremities}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='extremities'
@@ -107,6 +173,10 @@ const PhysicalExplorationTab = ({ physicalExploration, update }) => {
 				tab='Exploración neurológica'
 				key='neurologicalExamination'
 			>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={infoNeurologicalExploration}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='neurologicalExamination'

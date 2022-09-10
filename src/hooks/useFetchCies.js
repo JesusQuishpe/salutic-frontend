@@ -3,14 +3,90 @@ import { useContext, useEffect, useState } from 'react'
 import QrModalContext from '../contexts/QrModalContext'
 import { axiosErrorHandler } from '../handlers/axiosErrorHandler'
 import { CieService } from '../services/CieService'
+import { useLoader } from './useLoader'
 
 export const useFetchCies = () => {
+	const { openLoader, closeLoader } = useLoader()
 	const { visible } = useContext(QrModalContext)
-	const [page, setPage] = useState(1)
-	const [loading, setLoading] = useState(false)
 	const [cies, setCies] = useState(null)
-	const [isSearch, setIsSearch] = useState(false)
-	const [searchValue, setSearchValue] = useState('')
+	const [rowSelected, setRowSelected] = useState(null)
+	const [loading, setLoading] = useState(false)
+	const [lastSearch, setLastSearch] = useState(null)
+	const [modalParams, setModalParams] = useState(null)
+	const [show, setShow] = useState(false)
+
+	const columns = [
+		{
+			title: 'Código',
+			dataIndex: 'code',
+			width: 150,
+			ellipsis: true,
+		},
+		{
+			title: 'Nombre',
+			dataIndex: 'disease',
+			ellipsis: true,
+		},
+	]
+
+	const rowSelection = {
+		//selectedRowKeys: [rowSelected?.id],
+		onChange: (selectedRowKeys, selectedRows) => {
+			const cie = selectedRows[0]
+			console.log(cie)
+			setRowSelected(cie)
+		},
+	}
+
+	const closeModal = () => {
+		setModalParams({
+			show: false,
+			data: null,
+		})
+	}
+
+	const handleAddClick = () => {
+		setModalParams({
+			show: true,
+			data: null,
+		})
+	}
+
+	const handleEditClick = () => {
+		if (!rowSelected) return
+		setModalParams({
+			show: true,
+			data: rowSelected,
+		})
+	}
+
+	const handleDeleteClick = () => {
+		openLoader('Eliminando cie...')
+		CieService.deleteCie(rowSelected.id)
+			.then(() => {
+				message.success('Cie eliminado correctamente')
+				loadCies(1)
+				closeModalConfirmation()
+			})
+			.catch((error) => {
+				const { message: errorMessage } = axiosErrorHandler(error)
+				console.log(errorMessage)
+				message.error(errorMessage)
+			})
+			.finally(() => {
+				setLoading(false)
+				closeLoader()
+			})
+	}
+
+	const openModalConfirmation = () => {
+		if (!rowSelected) return
+		setShow(true)
+	}
+
+	const closeModalConfirmation = () => {
+		setShow(false)
+	}
 
 	const loadCies = (page) => {
 		setLoading(true)
@@ -25,18 +101,12 @@ export const useFetchCies = () => {
 			})
 	}
 
-	const searchCie = (page) => {
-		CieService.searchCieByDiseasePagination(searchValue, page)
-			.then((data) => {
-				console.log(data)
-				setCies({
-					result: [...data.result],
-					pagination: {
-						total: data.pagination.total,
-						perPage: data.pagination.perPage,
-						currentPage: data.pagination.currentPage,
-					},
-				})
+	const searchCie = ({ name, page }) => {
+		if (!name) return
+		setLoading(true)
+		CieService.searchCie({ name, page })
+			.then((cies) => {
+				setCies(cies)
 			})
 			.catch((err) => {
 				const { message: errorMessage } = axiosErrorHandler(err)
@@ -48,18 +118,14 @@ export const useFetchCies = () => {
 			})
 	}
 
-	const handleSearch = () => {
-		if (!searchValue) return
-		if (!isSearch) {
-			setPage(1)
-		}
-		setIsSearch(true)
+	const handleSearch = (value) => {
+		setLastSearch(value)
+		searchCie({ name: value, page: 1 })
 	}
 
 	const handleReload = () => {
-		setPage(1)
-		setSearchValue('')
-		setIsSearch(false)
+		setLastSearch(null)
+		setRowSelected(null)
 		loadCies(1)
 	}
 
@@ -67,30 +133,36 @@ export const useFetchCies = () => {
 		loadCies(1)
 	}, [])
 
-	useEffect(() => {
-		if (isSearch) {
-			searchCie(page)
+	const updatePage = (page) => {
+		if (lastSearch) {
+			searchCie({ name: lastSearch, page })
 		} else {
 			loadCies(page)
 		}
-	}, [page, isSearch])
-
-	const updatePage = (page) => {
-		setPage(page)
 	}
 
-	const updateSearchValue = (value) => setSearchValue(value)
-
+	const updateRowSelected = (value) => {
+		setRowSelected(value)
+	}
 	return {
-		page,
-		searchValue,
-		isSearch,
+		columns,
+		rowSelection,
+		rowSelected,
 		loading,
 		cies,
 		visible,
+		show,
+		modalParams,
+		loadCies,
+		closeModal,
 		updatePage,
-		updateSearchValue,
+		updateRowSelected,
 		handleSearch,
 		handleReload,
+		handleAddClick,
+		handleEditClick,
+		handleDeleteClick,
+		openModalConfirmation,
+		closeModalConfirmation,
 	}
 }

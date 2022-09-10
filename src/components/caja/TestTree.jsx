@@ -56,7 +56,7 @@ const TestTree = ({
 	}
 
 	return (
-		<Col span={8}>
+		<Col span={6}>
 			<Title level={4} type='secondary'>
 				Pruebas de laboratorio
 			</Title>

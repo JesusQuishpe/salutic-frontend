@@ -16,10 +16,28 @@ export const expedientSlice = createSlice({
 		interrogation: {},
 		allergies: {},
 		isLoading: false,
+		notFound: false,
 	},
 	reducers: {
 		setLoading: (state, action) => {
 			state.isLoading = action.payload
+		},
+		setNotFound: (state, action) => {
+			state.notFound = action.payload
+		},
+		resetExpedientData: (state, action) => {
+			state.data = {}
+			state.id = null
+			state.patient = {}
+			state.patientRecord = {}
+			state.physicalExploration = {}
+			state.physicalActivity = {}
+			state.smoking = {}
+			state.feedingHabits = {}
+			state.others = {}
+			state.interrogation = {}
+			state.allergies = {}
+			state.notFound = false
 		},
 		setPersonalInformation: (state, action) => {
 			state.personalInformation = action.payload
@@ -51,27 +69,25 @@ export const expedientSlice = createSlice({
 		updateAllergies: (state, action) => {
 			state.allergies = action.payload
 		},
-		setPatientExpedient: (state, action) => {
+		setExpedient: (state, action) => {
+			state.data = action.payload
 			state.id = action.payload.id
 			state.patient = action.payload.patient
 			state.patientRecord = action.payload.patientRecord
 			state.physicalExploration = action.payload.physicalExploration
-			state.physicalActivity = action.payload.lifestyle.physicalActivity
-			state.smoking = action.payload.lifestyle.smoking
-			state.feedingHabits = action.payload.lifestyle.feedingHabits
-			state.others = action.payload.lifestyle.others
+			state.physicalActivity = action.payload.physicalActivity
+			state.smoking = action.payload.smoking
+			state.feedingHabits = action.payload.feedingHabits
+			state.others = action.payload.others
 			state.interrogation = action.payload.interrogation
 			state.allergies = action.payload.allergies
-		},
-		setExpedient: (state, action) => {
-			state.data = action.payload
 		},
 	},
 })
 
 export const {
 	setLoading,
-	setPatientExpedient,
+	initExpedientState,
 	setPersonalInformation,
 	setAditionalInformation,
 	updatePatientRecord,
@@ -83,4 +99,6 @@ export const {
 	updateSmoking,
 	updateAllergies,
 	setExpedient,
+	setNotFound,
+	resetExpedientData,
 } = expedientSlice.actions

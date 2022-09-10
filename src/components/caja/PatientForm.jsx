@@ -10,10 +10,12 @@ import {
 	Select,
 } from 'antd'
 import moment from 'moment'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import LoaderContext from '../../contexts/LoaderContext'
+import { axiosErrorHandler } from '../../handlers/axiosErrorHandler'
 import { PatientService } from '../../services/PatientService'
+import { ContentNotFound } from '../not-found/ContentNotFound'
 
 const { Option } = Select
 
@@ -21,6 +23,7 @@ export const PatientForm = () => {
 	const { openLoader, closeLoader } = useContext(LoaderContext)
 	const [form] = Form.useForm()
 	const { patientId } = useParams()
+	const [notFound, setNotFound] = useState(false)
 	const isEdit = !!patientId
 
 	const initialForm = {
@@ -99,6 +102,10 @@ export const PatientForm = () => {
 			})
 		} catch (error) {
 			console.log(error)
+			const { status } = axiosErrorHandler(error)
+			if (status && status === 404) {
+				setNotFound(true)
+			}
 		} finally {
 			closeLoader()
 		}
@@ -109,6 +116,10 @@ export const PatientForm = () => {
 			loadPatient(parseInt(patientId))
 		}
 	}, [])
+
+	if (notFound) {
+		return <ContentNotFound />
+	}
 
 	return (
 		<>
@@ -190,6 +201,7 @@ export const PatientForm = () => {
 									<DatePicker
 										placeholder='Selecciona la fecha'
 										style={{ width: '100%' }}
+										format='DD/MM/YYYY'
 										onChange={birthDateChange}
 									/>
 								</Form.Item>

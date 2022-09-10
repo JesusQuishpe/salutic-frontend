@@ -1,4 +1,13 @@
-import { Button, Col, Popconfirm, Row, Space, Table } from 'antd'
+import {
+	Button,
+	Col,
+	message,
+	Popconfirm,
+	Row,
+	Space,
+	Table,
+	Tooltip,
+} from 'antd'
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import QrModalContext from '../../contexts/QrModalContext'
@@ -6,6 +15,7 @@ import { FileAddOutlined, DeleteOutlined } from '@ant-design/icons'
 import CustomSearch from '../qr/CustomSearch'
 import { QRModal } from '../qr/QRModal'
 import { OdontologyService } from '../../services/OdontologyService'
+import { createDateFromString } from '../../utils/functions'
 
 export const OdoPatientQueue = () => {
 	//Contexts
@@ -17,9 +27,10 @@ export const OdoPatientQueue = () => {
 	//Other hooks
 	const navigate = useNavigate()
 
-	const deleteRecord = async (nurId) => {
+	const deleteRecord = async (appoId) => {
 		try {
-			await OdontologyService.deleteRecord(nurId)
+			await OdontologyService.removeOfQueue(appoId)
+			message.success('Paciente quitado de la lista de espera')
 			loadPatientQueue()
 			//console.log(props);
 		} catch (error) {
@@ -39,10 +50,16 @@ export const OdoPatientQueue = () => {
 		{
 			title: 'Fecha',
 			dataIndex: 'date',
+			responsive: ['md'],
+			render: (_, record) => {
+				console.log(record)
+				return createDateFromString(record.date).format('DD/MM/YYYY')
+			},
 		},
 		{
 			title: 'Hora',
 			dataIndex: 'hour',
+			responsive: ['lg'],
 		},
 		{
 			title: 'Acciones',
@@ -53,21 +70,25 @@ export const OdoPatientQueue = () => {
 
 				return (
 					<Space>
-						<Button type='primary' onClick={onClick}>
-							<FileAddOutlined />
-						</Button>
-						<Popconfirm
-							title='Está seguro de eliminar?'
-							onConfirm={() => deleteRecord(record.appoId)}
-							okButtonProps={{
-								loading,
-							}}
-							//onCancel={() => setVisible(false)}
-						>
-							<Button type='primary' danger>
-								<DeleteOutlined />
+						<Tooltip title='Nueva consulta'>
+							<Button type='primary' onClick={onClick}>
+								<FileAddOutlined />
 							</Button>
-						</Popconfirm>
+						</Tooltip>
+						<Tooltip title='Quitar paciente de la lista de espera'>
+							<Popconfirm
+								title='Está seguro de quitar al paciente?'
+								onConfirm={() => deleteRecord(record.appoId)}
+								okButtonProps={{
+									loading,
+								}}
+								//onCancel={() => setVisible(false)}
+							>
+								<Button type='primary' danger>
+									<DeleteOutlined />
+								</Button>
+							</Popconfirm>
+						</Tooltip>
 					</Space>
 				)
 			},
@@ -121,6 +142,7 @@ export const OdoPatientQueue = () => {
 							onReload={handleReload}
 							allowClear
 							placeholder={'Buscar paciente por número de cédula'}
+							showQrButton={false}
 						/>
 					</Col>
 				</Row>

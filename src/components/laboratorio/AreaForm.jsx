@@ -1,10 +1,11 @@
 import { Form, Input, Row, Card, Col, Button, message } from 'antd'
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import LoaderContext from '../../contexts/LoaderContext'
 import { axiosErrorHandler } from '../../handlers/axiosErrorHandler'
 import { AreaService } from '../../services/AreaService'
 import { CustomInputNumber } from '../antd/CustomInputNumber'
+import { ContentNotFound } from '../not-found/ContentNotFound'
 
 const initialForm = {
 	code: '',
@@ -16,6 +17,7 @@ export const AreaForm = () => {
 	const { openLoader, closeLoader } = useContext(LoaderContext)
 	const [form] = Form.useForm()
 	const { areaId } = useParams()
+	const [notFound, setNotFound] = useState(false)
 	const isEdit = !!areaId
 
 	/**
@@ -49,13 +51,21 @@ export const AreaForm = () => {
 	 * @param {number} id identificador del area
 	 */
 	const getAreaById = async (id) => {
-		const area = await AreaService.getById(id)
-		console.log(area)
-		form.setFieldsValue({
-			name: area.name,
-			code: area.code,
-			price: area.price,
-		})
+		try {
+			const area = await AreaService.getById(id)
+			console.log(area)
+			form.setFieldsValue({
+				name: area.name,
+				code: area.code,
+				price: area.price,
+			})
+		} catch (error) {
+			console.log(error)
+			const { status } = axiosErrorHandler(error)
+			if (status && status === 404) {
+				setNotFound(true)
+			}
+		}
 	}
 
 	useEffect(() => {
@@ -63,6 +73,10 @@ export const AreaForm = () => {
 			getAreaById(areaId)
 		}
 	}, [isEdit])
+
+	if (notFound) {
+		return <ContentNotFound />
+	}
 
 	return (
 		<Row style={{ width: '100%' }}>

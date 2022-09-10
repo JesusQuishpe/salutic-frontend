@@ -2,6 +2,7 @@ import { Input, Tabs } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux/es/exports'
 import { updatePatientRecord } from '../../../store/slices/expedient/expedientSlice'
+import { LabelWithInfo } from './PhysicalExplorationTab'
 
 const { TabPane } = Tabs
 
@@ -26,6 +27,11 @@ const PatientRecordTab = ({ data, updatePatientRecord }) => {
 	return (
 		<Tabs tabPosition='left' defaultActiveKey='pathological'>
 			<TabPane tab='Patológicos' key='pathological'>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={null}
+					showIcon={false}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='pathological'
@@ -34,6 +40,11 @@ const PatientRecordTab = ({ data, updatePatientRecord }) => {
 				/>
 			</TabPane>
 			<TabPane tab='No patológicos' key='noPathological'>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={null}
+					showIcon={false}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='noPathological'
@@ -42,6 +53,11 @@ const PatientRecordTab = ({ data, updatePatientRecord }) => {
 				/>
 			</TabPane>
 			<TabPane tab='Perinatales' key='perinatal'>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={null}
+					showIcon={false}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='perinatal'
@@ -50,6 +66,11 @@ const PatientRecordTab = ({ data, updatePatientRecord }) => {
 				/>
 			</TabPane>
 			<TabPane tab='Ginecológicos' key='gynecological'>
+				<LabelWithInfo
+					label='Descripción'
+					popoverContent={null}
+					showIcon={false}
+				/>
 				<Input.TextArea
 					rows={30}
 					name='gynecological'

@@ -23,6 +23,8 @@ import { getOperands } from '../../utils/functions'
 import LoaderContext from '../../contexts/LoaderContext'
 import CalculatorIcon from '../../assets/png/calculator.png'
 import { ModalFormula } from './ModalFormula'
+import { axiosErrorHandler } from '../../handlers/axiosErrorHandler'
+import { ContentNotFound } from '../not-found/ContentNotFound'
 
 const { Option } = Select
 
@@ -59,59 +61,73 @@ export const TestForm = () => {
 	const [form] = Form.useForm()
 	const refValue = Form.useWatch('refValue', form)
 	const formula = Form.useWatch('formula', form)
+	const [notFound, setNotFound] = useState(false)
 
 	const isEdit = !!testId
 
 	const loadGroups = () => {
-		GroupService.getGroups().then((groups) => {
-			setGroups(
-				groups.map((group) => ({
-					label: group.name,
-					value: group.id,
-				}))
-			)
-		})
+		GroupService.getGroups()
+			.then((groups) => {
+				setGroups(
+					groups.map((group) => ({
+						label: group.name,
+						value: group.id,
+					}))
+				)
+			})
+			.catch((error) => console.log(error))
 	}
 
 	const loadUnits = () => {
-		MeasurementUnitService.getUnits().then((units) => {
-			setUnits(
-				units.map((unit) => ({
-					label: unit.name + '  ' + unit.abbreviation,
-					value: unit.id,
-				}))
-			)
-		})
+		MeasurementUnitService.getUnits()
+			.then((units) => {
+				setUnits(
+					units.map((unit) => ({
+						label: unit.name + '  ' + unit.abbreviation,
+						value: unit.id,
+					}))
+				)
+			})
+			.catch((error) => console.log(error))
 	}
 
 	const loadTestById = () => {
-		TestService.getById(testId).then((test) => {
-			console.log(test)
-			form.setFieldsValue({
-				groupId: test.groupId,
-				unitId: test.measureId,
-				code: test.code,
-				name: test.name,
-				refValue: test.refValue,
-				operatorType: test.operatorType,
-				of: test.of,
-				until: test.until,
-				operatorValue: test.operatorValue,
-				interpretation: test.interpretation,
-				maleOf: test.maleOf,
-				maleUntil: test.maleUntil,
-				maleInterpretation: test.maleInterpretation,
-				femaleOf: test.femaleOf,
-				femaleUntil: test.femaleUntil,
-				femaleInterpretation: test.femaleInterpretation,
-				qualitativeValue: test.qualitativeValue,
-				price: test.price,
-				isNumeric: test.isNumeric,
-				formula: test.formula,
-				notes: test.notes,
+		TestService.getById(testId)
+			.then((test) => {
+				//console.log(test)
+				form.setFieldsValue({
+					groupId: test.groupId,
+					unitId: test.measureId,
+					code: test.code,
+					name: test.name,
+					refValue: test.refValue,
+					operatorType: test.operatorType,
+					of: test.of,
+					until: test.until,
+					operatorValue: test.operatorValue,
+					interpretation: test.interpretation,
+					maleOf: test.maleOf,
+					maleUntil: test.maleUntil,
+					maleInterpretation: test.maleInterpretation,
+					femaleOf: test.femaleOf,
+					femaleUntil: test.femaleUntil,
+					femaleInterpretation: test.femaleInterpretation,
+					qualitativeValue: test.qualitativeValue,
+					price: test.price,
+					isNumeric: test.isNumeric,
+					formula: test.formula,
+					notes: test.notes,
+				})
 			})
-		})
+			.catch((error) => {
+				console.log(error)
+				const { status } = axiosErrorHandler(error)
+				if (status && status === 404) {
+					setNotFound(true)
+				}
+			})
 	}
+
 	const handleSubmit = async (values) => {
 		console.log(values)
 		try {
@@ -162,6 +178,11 @@ export const TestForm = () => {
 	const updateFormulaInForm = (value) => {
 		form.setFieldValue('formula', value)
 	}
+
+	if (notFound) {
+		return <ContentNotFound />
+	}
+
 	return (
 		<>
 			<Row style={{ width: '100%' }}>

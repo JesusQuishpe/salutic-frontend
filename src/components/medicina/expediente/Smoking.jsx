@@ -104,7 +104,7 @@ const Smoking = ({ smoking, update }) => {
 }
 const mapStateToProps = (state) => {
 	return {
-		smoking: state.expedient.smoking,
+		smoking: state.expedient.data.smoking,
 	}
 }
 const mapDispatchToProps = (dispatch) => {

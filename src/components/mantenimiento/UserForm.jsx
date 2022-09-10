@@ -6,6 +6,7 @@ import { axiosErrorHandler } from '../../handlers/axiosErrorHandler'
 import { useFetchRoles } from '../../hooks/useFetchRoles'
 import useUser from '../../hooks/useUser'
 import { UserService } from '../../services/UserService'
+import { ContentNotFound } from '../not-found/ContentNotFound'
 
 const initialForm = {
 	name: '',
@@ -20,6 +21,8 @@ export const UserForm = () => {
 	const { openLoader, closeLoader } = useContext(LoaderContext)
 	const { roles } = useFetchRoles()
 	const [form] = Form.useForm()
+	const [notFound, setNotFound] = useState(false)
+
 	const isEdit = !!userId
 
 	const handleSubmit = async (values) => {
@@ -54,14 +57,22 @@ export const UserForm = () => {
 	}
 
 	const loadUserById = () => {
-		UserService.getById(userId).then((user) => {
-			console.log(user)
-			form.setFieldsValue({
-				name: user.name,
-				email: user.email,
-				rolId: user.rolId,
+		UserService.getById(userId)
+			.then((user) => {
+				console.log(user)
+				form.setFieldsValue({
+					name: user.name,
+					email: user.email,
+					rolId: user.rolId,
+				})
 			})
-		})
+			.catch((error) => {
+				console.log(error)
+				const { status } = axiosErrorHandler(error)
+				if (status && status === 404) {
+					setNotFound(true)
+				}
+			})
 	}
 
 	useEffect(() => {
@@ -70,6 +81,11 @@ export const UserForm = () => {
 		}
 	}, [])
 
+	if (notFound) {
+		return <ContentNotFound />
+	}
+
+  
 	return (
 		<Card title={isEdit ? 'Actualizar usuario' : 'Crear usuario'}>
 			<Form
@@ -81,7 +97,7 @@ export const UserForm = () => {
 				<Form.Item
 					label='Nombre'
 					name='name'
-					extra='Máx 50 caracteres'
+					extra='Máx 20 caracteres'
 					rules={[
 						{
 							required: true,
@@ -89,7 +105,12 @@ export const UserForm = () => {
 						},
 					]}
 				>
-					<Input maxLength={50} />
+					<Input
+						maxLength={20}
+						onChange={(e) =>
+							form.setFieldValue('name', e.target.value.trim())
+						}
+					/>
 				</Form.Item>
 				<Form.Item label='Correo electrónico' name='email'>
 					<Input maxLength={150} />

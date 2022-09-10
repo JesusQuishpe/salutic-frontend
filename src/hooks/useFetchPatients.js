@@ -1,5 +1,4 @@
 import { message } from 'antd'
-import { AxiosError } from 'axios'
 import { useContext, useEffect, useState } from 'react'
 import QrModalContext from '../contexts/QrModalContext'
 import { axiosErrorHandler } from '../handlers/axiosErrorHandler'
@@ -53,6 +52,22 @@ export const useFetchPatients = () => {
 		loadPatients(1)
 	}
 
+	const deleteRecord = async (patientId) => {
+		try {
+			setLoading(true)
+			await PatientService.deletePatient(patientId)
+			message.success('Paciente eliminado correctamente')
+			onReload()
+			//console.log(props);
+		} catch (error) {
+			console.log(error)
+			const { message: errorMessage } = axiosErrorHandler(error)
+			message.error(errorMessage)
+		} finally {
+			setLoading(false)
+		}
+	}
+
 	useEffect(() => {
 		loadPatients(page)
 	}, [page])
@@ -69,5 +84,6 @@ export const useFetchPatients = () => {
 		updatePage,
 		onSearch,
 		onReload,
+		deleteRecord,
 	}
 }

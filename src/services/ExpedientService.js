@@ -1,4 +1,4 @@
-import { axiosGet, axiosPut } from './axiosRequests'
+import { axiosDelete, axiosGet, axiosPut } from './axiosRequests'
 
 export const ExpedientService = {
 	getPatientQueue: () => axiosGet(`expedientes?queue=true`),
@@ -7,4 +7,5 @@ export const ExpedientService = {
 		axiosGet(`expedientes?identification=${identification}`),
 	getExpedient: (id) => axiosGet(`expedientes/${id}`),
 	updateExpedient: (data, id) => axiosPut(`expedientes/${id}`, data),
+	deleteExpedient: (id) => axiosDelete(`expedientes/${id}`),
 }

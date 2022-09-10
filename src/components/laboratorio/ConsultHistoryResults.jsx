@@ -1,16 +1,6 @@
-import {
-	Button,
-	Card,
-	DatePicker,
-	Form,
-	Input,
-	Popconfirm,
-	Row,
-	Space,
-	Table,
-} from 'antd'
-import React, { useState } from 'react'
-import CustomSearch from '../qr/CustomSearch'
+import { Button, Card, Popconfirm, Space, Table } from 'antd'
+import React from 'react'
+
 import {
 	EditOutlined,
 	DeleteOutlined,
@@ -19,16 +9,22 @@ import {
 import { Link } from 'react-router-dom'
 import { useFetchLaboratoryResults } from '../../hooks/useFetchLaboratoryResults'
 import { END_POINT } from '../../utils/conf'
+import CustomFilterSearch from '../qr/CustomFilterSearch'
 
 export const ConsultHistoryResults = () => {
-	const [form] = Form.useForm()
-	const { results, loading, handleDeleteClick, searchResults } =
-		useFetchLaboratoryResults()
+	const {
+		formRef,
+		results,
+		loading,
+		handleDeleteClick,
+		handleSubmitSearch,
+		updatePage,
+	} = useFetchLaboratoryResults()
 
 	const columns = [
 		{
-			title: 'N° orden',
-			dataIndex: 'orderId',
+			title: 'Id',
+			dataIndex: 'id',
 		},
 		{
 			title: 'Paciente',
@@ -54,7 +50,7 @@ export const ConsultHistoryResults = () => {
 						>
 							<FilePdfOutlined />
 						</Button>
-						<Link to={`${record.orderId}/editar`}>
+						<Link to={`${record.id}/editar`}>
 							<Button type='primary'>
 								<EditOutlined />
 							</Button>
@@ -79,27 +75,26 @@ export const ConsultHistoryResults = () => {
 
 	return (
 		<>
-			{/*<Row style={{ marginBottom: '10px' }}>
-				<Form layout='inline' form={form}>
-					<Form.Item label='Desde' name='startDate'>
-						<DatePicker />
-					</Form.Item>
-					<Form.Item label='Hasta' name='endDate'>
-						<DatePicker />
-					</Form.Item>
-				</Form>
-  </Row>*/}
-			<Card title='Consulta de resultados'>
-				<CustomSearch
-					placeholder='Buscar por número de cédula'
-					onSearch={searchResults}
-					showReloadButton={false}
-					allowClear
-				/>
+			<h2>Consulta de resultados</h2>
+			<CustomFilterSearch
+				ref={formRef}
+				placeholder='Cédula del paciente'
+				allowClear
+				onSearch={handleSubmitSearch}
+				cardType='inner'
+			/>
+			<Card title='Resultados' type='inner'>
 				<Table
 					columns={columns}
-					dataSource={results}
+					dataSource={results?.result}
 					rowKey={(record) => record.orderId}
+					loading={loading}
+					pagination={{
+						total: results?.pagination?.total || 0,
+						current: results?.pagination?.currentPage || 1,
+						pageSize: results?.pagination?.perPage || 10,
+						onChange: updatePage,
+					}}
 				/>
 			</Card>
 		</>

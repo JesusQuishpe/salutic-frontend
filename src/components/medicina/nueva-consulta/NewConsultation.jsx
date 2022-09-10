@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Button, Card, Descriptions, message, Row, Space, Tabs } from 'antd'
 import { SaveOutlined } from '@ant-design/icons'
-import { useLocation, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import moment from 'moment'
 import { parseDate, parseHour } from '../../../utils/functions'
 import { LaboratoryExams } from './LaboratoryExams'
@@ -9,11 +9,14 @@ import Interrogation from './Interrogation'
 import Exploration from './Exploration'
 import MedCies from './MedCies'
 import Evaluation from './Evaluation'
-import { PatientService } from '../../../services/PatientService'
 import useUser from '../../../hooks/useUser'
 import LoaderContext from '../../../contexts/LoaderContext'
 import { MedConsultationService } from '../../../services/MedConsultationService'
 import { axiosErrorHandler } from '../../../handlers/axiosErrorHandler'
+import { CitationWarning } from '../../not-found/CitationWarning'
+
+import { PrevLoadingPage } from '../../antd/PrevLoadingPage'
+import { PrescriptionTab } from './PrescriptionTab'
 
 const { TabPane } = Tabs
 
@@ -42,6 +45,7 @@ const initialEvaluation = {
 }
 
 export const NewConsultation = () => {
+	const navigate = useNavigate()
 	const { openLoader, closeLoader } = useContext(LoaderContext)
 	const { appoId, consultationId } = useParams()
 	const isEdit = !!consultationId
@@ -50,8 +54,10 @@ export const NewConsultation = () => {
 	const [exploration, setExploration] = useState(initialExploration)
 	const [evaluation, setEvaluation] = useState(initialEvaluation)
 	const [cies, setCies] = useState([])
+	const [prescriptions, setPrescriptions] = useState([])
 	const [citationInfo, setCitationInfo] = useState(null)
 	const [data, setData] = useState(null)
+	const [citationError, setCitationError] = useState(null)
 
 	const loadPatientInfo = async () => {
 		try {
@@ -61,6 +67,11 @@ export const NewConsultation = () => {
 			console.log(citation)
 		} catch (error) {
 			console.log(error)
+			const { message: errorMessage, status } = axiosErrorHandler(error)
+			console.log(status)
+			if (status === 404) {
+				setCitationError({ message: errorMessage, status })
+			}
 		}
 	}
 
@@ -94,10 +105,22 @@ export const NewConsultation = () => {
 						disease: item.cie.disease,
 					}))
 				)
+				setPrescriptions(
+					consultation?.prescriptions.map((item) => ({
+						medicineId: item.medicineId,
+						medicineName: item.medicine.genericName,
+						dosification: item.dosification,
+					}))
+				)
 			}
 			console.log(consultation)
 		} catch (error) {
 			console.log(error)
+			const { message: errorMessage, status } = axiosErrorHandler(error)
+			console.log(status)
+			if (status === 404) {
+				setCitationError({ message: errorMessage, status })
+			}
 		}
 	}
 
@@ -127,6 +150,7 @@ export const NewConsultation = () => {
 				...exploration,
 				...evaluation,
 				cies: formatCies,
+				prescriptions,
 			}
 			if (isEdit) {
 				await MedConsultationService.updateConsultation(
@@ -137,6 +161,7 @@ export const NewConsultation = () => {
 			} else {
 				await MedConsultationService.createConsultation(dataToSend)
 				message.success('Consulta creada correctamente')
+				navigate('/medicina/citas')
 			}
 			console.log(dataToSend)
 		} catch (error) {
@@ -149,13 +174,25 @@ export const NewConsultation = () => {
 	}
 
 	useEffect(() => {
-		console.log(isEdit)
 		if (isEdit) {
 			loadDataForEdit()
 		} else {
 			loadPatientInfo()
 		}
 	}, [])
+
+	if (citationError) {
+		return <CitationWarning message={citationError.message} />
+	}
+
+	//Estos if muestran primero el loading y no la UI, hasta que los datos estén listos
+	if (isEdit && !data) {
+		return <PrevLoadingPage />
+	}
+
+	if (!isEdit & !citationInfo) {
+		return <PrevLoadingPage />
+	}
 
 	return (
 		<>
@@ -167,8 +204,12 @@ export const NewConsultation = () => {
 					</Button>
 				</Space>
 			</Row>
-			<Card style={{ marginBottom: '10px' }}>
-				<Descriptions title='Información del paciente' column={3}>
+			<Card
+				style={{ marginBottom: '10px' }}
+				title='Información del paciente'
+				type='inner'
+			>
+				<Descriptions column={3}>
 					<Descriptions.Item label='Cédula'>
 						{isEdit
 							? data?.nursingArea?.medicalAppointment?.patient
@@ -229,6 +270,13 @@ export const NewConsultation = () => {
 				</TabPane>
 				<TabPane tab='Evaluación' key='evaluacion'>
 					<Evaluation data={data} update={setEvaluation} />
+				</TabPane>
+				<TabPane tab='Recetas' key='recetas'>
+					<PrescriptionTab
+						isEdit={isEdit}
+						data={prescriptions}
+						update={setPrescriptions}
+					/>
 				</TabPane>
 				<TabPane tab='Exámenes de lab...' key='examenes'>
 					<LaboratoryExams

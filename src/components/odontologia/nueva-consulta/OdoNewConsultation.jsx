@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux/es/exports'
 import {
 	getData,
 	getDataForEdit,
+	//getDataForEdit,
 } from '../../../store/slices/odontology/thunks'
 import OdoIndicatorsTab from './OdoIndicatorsTab'
 import OdoFamilyHistoryTab from './OdoFamilyHistoryTab'
@@ -34,9 +35,10 @@ import { toBlob } from 'html-to-image'
 import LoaderContext from '../../../contexts/LoaderContext'
 import { OdontologyService } from '../../../services/OdontologyService'
 import useUser from '../../../hooks/useUser'
-import { NotFound } from '../../not-found/NotFound'
 import { axiosErrorHandler } from '../../../handlers/axiosErrorHandler'
 import { resetStateOnOdontology } from '../../../store/slices/odontology/odontologySlice'
+import { CitationWarning } from '../../not-found/CitationWarning'
+import { PrevLoadingPage } from '../../antd/PrevLoadingPage'
 
 const { TabPane } = Tabs
 const { Title } = Typography
@@ -70,6 +72,7 @@ export const OdoNewConsultation = () => {
 	const dispatch = useDispatch()
 	const {
 		data,
+		odoCitationError,
 		generalInfo,
 		familyHistory,
 		indicator,
@@ -78,9 +81,9 @@ export const OdoNewConsultation = () => {
 		treatments,
 		movilitiesRecessions,
 		teeth,
-		acta,
-		initValues,
+		isActaChanged,
 	} = useSelector((state) => state.odontology)
+
 	const isEdit = !!recId
 
 	const validateTabsForm = () => {
@@ -176,16 +179,16 @@ export const OdoNewConsultation = () => {
 					movilitiesRecessions,
 					teeth,
 				},
-				acta,
+				isActaChanged,
 			}
-
+			console.log(dataToSend)
 			const formData = new FormData()
 			formData.append('odontogram_image', odoImg)
 			formData.append('data', JSON.stringify(dataToSend))
-			formData.append('acta', odoActRef.current?.actaFile)
+			formData.append('acta', odoActRef.current?.acta)
 			console.log(odoImg)
 			console.log(dataToSend)
-			console.log(odoActRef.current?.actaFile)
+			console.log(odoActRef.current?.acta)
 			if (isEdit) {
 				formData.append('_method', 'PUT')
 				await OdontologyService.updatePatientRecord(formData, recId)
@@ -222,8 +225,12 @@ export const OdoNewConsultation = () => {
 		}
 	}, [])
 
-	if (data?.attended) {
-		return <NotFound />
+	if (odoCitationError) {
+		return <CitationWarning message={odoCitationError.message} />
+	}
+
+	if (!data) {
+		return <PrevLoadingPage />
 	}
 
 	return (
@@ -258,6 +265,7 @@ export const OdoNewConsultation = () => {
 												`acta/${recId}/download`
 											}
 											target='_blank'
+											disabled={!data?.acta?.url}
 										>
 											Descargar acta
 										</Button>
@@ -326,7 +334,7 @@ export const OdoNewConsultation = () => {
 							<OdoOdontogramTab ref={odontogramRef} />
 						</TabPane>
 						<TabPane tab='Acta' key='acta'>
-							<OdoAct ref={odoActRef} />
+							<OdoAct ref={odoActRef} recId={recId} />
 						</TabPane>
 					</Tabs>
 				</Card>

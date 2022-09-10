@@ -37,24 +37,8 @@ const AditionalInformation = ({ data, update }) => {
 					<Form.Item label='Estado civil' name='maritalStatus'>
 						<Input />
 					</Form.Item>
-					<Form.Item
-						name='gender'
-						label='Sexo'
-						rules={[
-							{
-								required: true,
-								message: 'El campo es requerido',
-							},
-						]}
-					>
-						<Select
-							placeholder='Selecciona un género'
-							//onChange={this.onGenderChange}
-							allowClear
-						>
-							<Option value='Masculino'>Masculino</Option>
-							<Option value='Femenino'>Femenino</Option>
-						</Select>
+					<Form.Item label='Procedencia' name='origin'>
+						<Input />
 					</Form.Item>
 				</Col>
 				<Col span={12}>
@@ -69,16 +53,6 @@ const AditionalInformation = ({ data, update }) => {
 					</Form.Item>
 				</Col>
 			</Row>
-			<Form.Item
-				label='Procedencia'
-				name='origin'
-				labelCol={{
-					span: 3,
-				}}
-				wrapperCol={{ span: 21 }}
-			>
-				<Input />
-			</Form.Item>
 		</Form>
 	)
 }

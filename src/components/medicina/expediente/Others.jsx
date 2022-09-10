@@ -67,7 +67,7 @@ const Others = ({ others, update }) => {
 }
 const mapStateToProps = (state) => {
 	return {
-		others: state.expedient.others,
+		others: state.expedient.data.others,
 	}
 }
 const mapDispatchToProps = (dispatch) => {

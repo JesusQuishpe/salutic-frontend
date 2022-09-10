@@ -103,7 +103,7 @@ const PhysicalActivityComp = ({ physicalActivity, update }) => {
 }
 const mapStateToProps = (state) => {
 	return {
-		physicalActivity: state.expedient.physicalActivity,
+		physicalActivity: state.expedient.data.physicalActivity,
 	}
 }
 const mapDispatchToProps = (dispatch) => {

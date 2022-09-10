@@ -1,4 +1,4 @@
-import { axiosDelete, axiosGet, axiosPost, axiosPut } from './axiosRequests'
+import { axiosDelete, axiosGet, axiosPost } from './axiosRequests'
 
 export const OdontologyService = {
 	getDataForNewConsultation: (appoId) =>
@@ -11,7 +11,12 @@ export const OdontologyService = {
 	getPatientRecordsByIdentification: (identification) =>
 		axiosGet(`odontologia/fichas/${identification}`),
 	getPatientQueue: () => axiosGet(`odontologias?q=queue`),
-	getMedicalHistoryByIdentification: (identification) =>
-		axiosGet(`odontologias?q=history&identification=${identification}`),
+	searchMedicalHistories: ({ identification, startDate, endDate, page }) =>
+		axiosGet(
+			`odontologias/search?identification=${identification}&start_date=${startDate}&end_date=${endDate}&page=${page}`
+		),
 	deleteRecord: (id) => axiosDelete(`odontologias/${id}`),
+	removeOfQueue: (appoId) =>
+		axiosDelete(`odontologia/${appoId}/eliminar-paciente`),
+	getActaFile: (recId) => axiosGet(`odontologia/${recId}/acta`),
 }

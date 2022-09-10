@@ -1,4 +1,4 @@
-import { Button, Popconfirm, Space, Table } from 'antd'
+import { Button, message, Popconfirm, Space, Table, Tooltip } from 'antd'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import QrModalContext from '../../contexts/QrModalContext'
 import useUser from '../../hooks/useUser'
@@ -7,6 +7,8 @@ import CustomSearch from '../qr/CustomSearch'
 import { QRModal } from '../qr/QRModal'
 import { FileAddOutlined, DeleteOutlined } from '@ant-design/icons'
 import NursingModal from './NursingModal'
+import { axiosErrorHandler } from '../../handlers/axiosErrorHandler'
+import { createDateFromString } from '../../utils/functions'
 
 export const PatientQueue = () => {
 	const { user } = useUser()
@@ -29,10 +31,12 @@ export const PatientQueue = () => {
 	const deleteRecord = async (appoId) => {
 		try {
 			setLoading(true)
-			await NursingService.delete(appoId)
+			await NursingService.removeOfQueue(appoId)
+			message.success('Paciente eliminado de la lista de espera')
 			loadPatientQueue()
 		} catch (error) {
-			console.log(error)
+			const { message: errorMessage } = axiosErrorHandler(error)
+			message.error(errorMessage)
 		} finally {
 			setLoading(false)
 		}
@@ -93,10 +97,12 @@ export const PatientQueue = () => {
 		{
 			title: 'N° cita',
 			dataIndex: 'appoId', //Id is the appoId
+			responsive: ['md'],
 		},
 		{
 			title: 'Paciente',
 			dataIndex: 'fullname',
+			//responsive: ['lg'],
 		},
 		{
 			title: 'Area',
@@ -105,30 +111,39 @@ export const PatientQueue = () => {
 		{
 			title: 'Fecha',
 			dataIndex: 'date',
+			responsive: ['lg'],
+			render: (_, record) => {
+				return createDateFromString(record.date).format('DD/MM/YYYY')
+			},
 		},
 		{
 			title: 'Acciones',
 			render: (_, record) => {
 				return (
 					<Space>
-						<Button
-							type='primary'
-							onClick={() => openModal(record)}
-						>
-							<FileAddOutlined />
-						</Button>
-						<Popconfirm
-							title='Está seguro de eliminar?'
-							onConfirm={() => deleteRecord(record.appoId)}
-							okButtonProps={{
-								loading,
-							}}
-							//onCancel={() => setVisible(false)}
-						>
-							<Button type='primary' danger>
-								<DeleteOutlined />
+						<Tooltip title='Ingresar datos'>
+							<Button
+								type='primary'
+								onClick={() => openModal(record)}
+							>
+								<FileAddOutlined />
 							</Button>
-						</Popconfirm>
+						</Tooltip>
+						<Tooltip title='Quitar paciente de la lista de espera'>
+							<Popconfirm
+								title='Está seguro de quitar el paciente?'
+								onConfirm={() => deleteRecord(record.appoId)}
+								okButtonProps={{
+									loading,
+								}}
+								cancelText='Cancelar'
+								//onCancel={() => setVisible(false)}
+							>
+								<Button type='primary' danger>
+									<DeleteOutlined />
+								</Button>
+							</Popconfirm>
+						</Tooltip>
 					</Space>
 				)
 			},
@@ -148,6 +163,7 @@ export const PatientQueue = () => {
 					allowClear
 					placeholder={'Buscar paciente por número de cédula'}
 					onReload={handleReload}
+					showQrButton={false}
 				/>
 				<Table
 					columns={columns}

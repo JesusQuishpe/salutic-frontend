@@ -10,23 +10,62 @@ const TestTable = ({ tests, deleteTest }) => {
 			{
 				title: 'Código',
 				dataIndex: 'code',
+				onCell: (record, index) => {
+					if (record.children) {
+						return {
+							colSpan: 1,
+						}
+					}
+					return { colSpan: 2 }
+				},
+				render: (_, record) => {
+					return record.children ? '' : record.code
+				},
 			},
 			{
 				title: 'Prueba',
 				dataIndex: 'name',
+				onCell: (record, index) => {
+					console.log(index)
+					if (record.children) {
+						return {
+							colSpan: 4,
+						}
+					}
+					return { colSpan: 2 }
+				},
 			},
 			{
 				title: 'Precio',
 				dataIndex: 'price',
+				onCell: (record, index) => {
+					console.log(record)
+					if (record.children) {
+						return {
+							colSpan: 0,
+						}
+					}
+					return { colSpan: 2 }
+				},
+				render: (_, record) => {
+					return record.children ? '' : '$' + record.price
+				},
 			},
 			{
 				title: 'Acciones',
+				onCell: (record, index) => {
+					if (record.children) {
+						return { colSpan: 0 }
+					}
+					return { colSpan: 2 }
+				},
 				render: (_, record) => {
 					const onClick = (record) => {
 						if (deleteTest) {
-							deleteTest(record.id)
+							deleteTest(record)
 						}
 					}
+
 					return (
 						<Button
 							type='primary'
@@ -47,6 +86,7 @@ const TestTable = ({ tests, deleteTest }) => {
 				Pruebas seleccionadas
 			</Title>
 			<Table
+				size='small'
 				columns={columns}
 				dataSource={tests}
 				pagination

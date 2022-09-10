@@ -22,6 +22,7 @@ const ModalCie = ({ params, closeModal, crudOperations }) => {
 	const { onAdd, onUpdate } = crudOperations
 
 	const initialForm = {
+		id: null,
 		cieId: null,
 		code: '',
 		disease: '',
@@ -111,6 +112,9 @@ const ModalCie = ({ params, closeModal, crudOperations }) => {
 						...initialForm,
 					}}
 				>
+					<Form.Item noStyle name='id'>
+						<Input type='hidden' />
+					</Form.Item>
 					<Form.Item noStyle name='cieId'>
 						<Input type='hidden' />
 					</Form.Item>

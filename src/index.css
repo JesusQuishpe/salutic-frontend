@@ -28,9 +28,19 @@
 }
 
 .logo {
-  height: 32px;
-  margin: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  height: 150px;
+  font-size: 30px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 300;
+  font-style: normal;
+}
+.logo img{
+  width: 100%;
+  
 }
 
 .site-layout .site-layout-background {
@@ -44,4 +54,7 @@
 }
 .site-layout-content-background{
   background: #fff;
+}
+.user-name{
+  padding: 0 24px;
 }
